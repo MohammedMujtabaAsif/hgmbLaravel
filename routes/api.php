@@ -23,10 +23,11 @@ Route::group([
       'middleware' => 'auth:api'
     ], function() {
         Route::get('logout', 'UsersController@logout');
-        Route::get('user', 'USersController@user');
+        Route::get('user', 'UsersController@user');
+        Route::get('allUsers', 'UsersController@allUsers');
     });
 });
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });

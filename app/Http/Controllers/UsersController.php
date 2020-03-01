@@ -11,15 +11,15 @@ use App\User;
 
 class UsersController extends Controller
 {
-    // /**
-    //  * Create user
-    //  *
-    //  * @param  [string] name
-    //  * @param  [string] email
-    //  * @param  [string] password
-    //  * @param  [string] password_confirmation
-    //  * @return [string] message
-    //  */
+    /**
+     * Create user
+     *
+     * @param  [string] name
+     * @param  [string] email
+     * @param  [string] password
+     * @param  [string] password_confirmation
+     * @return [string] message
+     */
     public function signup(Request $request)
         {
             $validator = Validator::make($request->all(), [
@@ -32,16 +32,20 @@ class UsersController extends Controller
                 'city' => 'required|string',
                 'maritalStatus'=>'required|string'
             ]);
+
             if ($validator->fails()) {
                 return response()->json([
                 'success' => false,
                 'message' => $validator->errors(),
                 ], 401);
             }
+
             $input = $request->all();
             $input['password'] = bcrypt($input['password']);
             $user = User::create($input);
+
             $success['token'] = $user->createToken('appToken')->accessToken;
+
             return response()->json([
                 'success' => true,
                 'token' => $success,
@@ -78,6 +82,7 @@ class UsersController extends Controller
         ], 401);
         }
     }
+
   
     /**
      * Logout user (Revoke the token)
@@ -86,25 +91,37 @@ class UsersController extends Controller
      */
     public function logout()
     {
-    //if user is logged in
+      //if user is logged in
       if (Auth::user()) {
         $user = Auth::user()->token();
         $user->revoke();
-
-    //if logout request worked
+      //if logout request worked
         return response()->json([
           'success' => true,
           'message' => 'Logout success'
       ]);
       }
-      //if lougout request failed
       else {
+      //if lougout request failed
         return response()->json([
           'success' => false,
           'message' => 'Unable to Logout'
         ]);
       }
     }
+
+
+    /**
+     * Show a list of all of the application's users.
+     *
+     * @return Response
+     */
+    public function allUsers()
+    {
+        $users = User::where('id', '!=', auth()->id())->get();
+        return $users;
+    }
+
   
     /**
      * Get the authenticated User
