@@ -119,7 +119,7 @@ class UsersController extends Controller
     public function allUsers()
     {
         $users = User::where('id', '!=', auth()->id())->get();
-        return $users;
+        return response()->json($users);
     }
 
   
