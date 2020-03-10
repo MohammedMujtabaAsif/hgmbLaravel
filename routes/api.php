@@ -25,6 +25,7 @@ Route::group([
         Route::get('logout', 'UsersController@logout');
         Route::get('user', 'UsersController@user');
         Route::get('allUsers', 'UsersController@allUsers');
+        Route::get('matches', 'UsersController@allMatches');
     });
 });
 

@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\User;
 
-
 class UsersController extends Controller
 {
+
+  
     /**
      * Create user
      *
@@ -52,7 +53,8 @@ class UsersController extends Controller
                 'user' => $user
             ]);
         }
-  
+
+
     /**
      * Login user and create token
      *
@@ -122,7 +124,18 @@ class UsersController extends Controller
         return response()->json($users);
     }
 
-  
+    /**
+     * Show a list of all of the application's users.
+     *
+     * @return Response
+     */
+    public function allMatches()
+    {
+      $matches = User;
+      return response()->json($matches);
+    }
+
+
     /**
      * Get the authenticated User
      *

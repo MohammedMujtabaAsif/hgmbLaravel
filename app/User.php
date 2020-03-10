@@ -6,10 +6,11 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Hootlex\Friendships\Traits\Friendable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, Friendable;
 
     /**
      * The attributes that are mass assignable.
@@ -17,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstNames', 'surname', 'prefName', 'email', 'password', 'phoneNumber', 'city', 'maritalStatus', 'userType'
+        'firstNames', 'surname', 'prefName', 'email', 'password', 'phoneNumber', 'city', 'maritalStatus', 'gender', 'minPrefAge', 'maxPrefAge', 'dob', 'numOfChildren', 'bio', 'userType'
     ];
 
     /**
