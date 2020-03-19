@@ -152,7 +152,17 @@ class UsersController extends Controller
       $user = User::auth;
       $recipient = User::where('id', $id)->first();
 
-      $user->befriend($recipient);
+      if ($user->befriend($recipient)) {
+        return response()->json([
+          'success' => true,
+          'message' => 'Friend Request Sent',
+        ], 401);
+      } else {
+        return response()->json([
+          'success' => false,
+          'message' => "Couldn't Send Friend Request",
+        ], 401);
+      }
     }
 
     public function getFriendRequests(){
