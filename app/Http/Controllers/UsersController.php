@@ -147,10 +147,10 @@ class UsersController extends Controller
       // TODO implement matches code
     }
 
-    public function sendFriendRequest($id)
+    public function sendFriendRequest(Request $request)
     {
       $user = User::auth;
-      $recipient = User::where('id', $id)->first();
+      $recipient = User::where('id', $request('id'))->first();
 
       $user->befriend($recipient);
     }
