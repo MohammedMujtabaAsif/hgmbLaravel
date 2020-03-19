@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use Hootlex\Friendships\Traits\Friendable;
+use Demency\Friendships\Traits\Friendable;
 
 class User extends Authenticatable
 {

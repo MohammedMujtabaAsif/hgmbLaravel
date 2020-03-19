@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Hootlex\Friendships\Traits\Friendabassdle;
+use Demency\Friendships\Traits\Friendable;
 use Validator;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
