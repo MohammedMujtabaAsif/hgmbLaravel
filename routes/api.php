@@ -26,6 +26,8 @@ Route::group([
         Route::get('user', 'UsersController@user');
         Route::get('allUsers', 'UsersController@allUsers');
         Route::get('matches', 'UsersController@allMatches');
+        Route::get('matches', ' UsersController@sendFriendRequest');
+        Route::get('prendingFriendRequests',' UsersController@getFriendRequests');
     });
 });
 
