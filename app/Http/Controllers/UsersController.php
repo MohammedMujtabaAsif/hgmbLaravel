@@ -153,10 +153,10 @@ class UsersController extends Controller
      * @param [int] id
      * @return Response
      */
-    public function sendFriendRequest()
+    public function sendFriendRequest(Request $request)
     {
       $user = $request->user();
-      $recipient = User::where('id', $id);
+      $recipient = User::where('id', request('id'));
 
       if($user->befriend($recipient)!=false){
         return response()->json([        
