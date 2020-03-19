@@ -153,7 +153,7 @@ class UsersController extends Controller
      * @param [int] id
      * @return Response
      */
-    public function sendFriendRequest($id)
+    public function sendFriendRequest()
     {
       $user = Auth::user();
       $recipient = User::where('id', $id);
