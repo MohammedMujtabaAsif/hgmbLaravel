@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Hootlex\Friendships\Traits\Friendabassdle;
 use Validator;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -124,17 +125,6 @@ class UsersController extends Controller
         return response()->json($users);
     }
 
-    /**
-     * Show a list of all of the application's users.
-     *
-     * @return Response
-     */
-    public function allMatches()
-    {
-      $matches = User;
-      return response()->json($matches);
-    }
-
 
     /**
      * Get the authenticated User
@@ -145,4 +135,24 @@ class UsersController extends Controller
     {
         return response()->json($request->user());
     }
+
+
+    /**
+     * Show a list of all of the user's matches.
+     *
+     * @return Response
+     */
+    public function allMatches()
+    {
+      // TODO implement matches code
+    }
+
+    public function sendFriendRequest(request $request)
+    {
+      $user = User::auth;
+      $recipient = User::auth;
+
+      $user->befriend($recipient);
+    }
+
 }

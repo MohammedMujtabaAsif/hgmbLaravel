@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Hootlex\Friendships\Traits\Friendable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Model
 {
     use HasApiTokens, Notifiable, Friendable;
 

@@ -9,8 +9,8 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "demency/laravel-friendships": "^1.0",
         "fideloper/proxy": "^4.0",
-        "hootlex/laravel-friendships": "^1.0",
         "laravel/framework": "^6.2",
         "laravel/passport": "^8.4",
         "laravel/tinker": "^2.0"
