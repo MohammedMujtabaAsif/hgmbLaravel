@@ -221,7 +221,7 @@ class UsersController extends Controller
 
 
     public function getMatchedUsers(Request $request){
-      $users = $request->user();
+      $user = $request->user();
       return response()->json($user->getAcceptedFriendships());
     }
 
