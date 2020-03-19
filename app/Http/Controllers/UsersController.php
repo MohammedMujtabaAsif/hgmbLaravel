@@ -149,14 +149,14 @@ class UsersController extends Controller
 
     public function sendFriendRequest(Request $request)
     {
-      $user = User::auth;
+      $user = $request->user();
       $recipient = User::where('id', $request('id'))->first();
 
       $user->befriend($recipient);
     }
 
-    public function getFriendRequests(){
-      $user = User::auth;
+    public function getFriendRequests(Request $request){
+      $user = $request->user();
       return $user->getPendingFriendships();
     }
 
