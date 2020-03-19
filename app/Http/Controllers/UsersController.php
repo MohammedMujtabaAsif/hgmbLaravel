@@ -153,13 +153,13 @@ class UsersController extends Controller
      * @param [int] id
      * @return Response
      */
-    public function sendFriendRequest(Request $request, $id)
+    public function sendFriendRequest($id)
     {
-      $user = $request->user();
+      $user = Auth::user();
       $recipient = User::where('id', $id);
 
       if($user->befriend($recipient)!=false){
-        return respnse()->json([        
+        return response()->json([        
         'success' => true,
         'message' => 'Friend Request Sent'
       ]);
@@ -173,7 +173,7 @@ class UsersController extends Controller
     }
 
     public function getFriendRequests(Request $request){
-      $user = $request->user();
+      $user = Auth::user();
       return response()->json($user->getPendingFriendships());
     }
 
