@@ -153,11 +153,11 @@ class UsersController extends Controller
       $recipient = User::where('id', $id)->first();
 
       $user->befriend($recipient);
-      
-      return response()->json([
-        'success' => true,
-        'message' => 'Friend Request Sent'
-      ]);
+        return response()->json([
+          'success' => true,
+          'message' => 'Friend Request Sent',
+        ]);
+
     }
 
     public function getFriendRequests(){
