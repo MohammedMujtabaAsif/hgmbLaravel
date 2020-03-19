@@ -153,10 +153,14 @@ class UsersController extends Controller
      * @param [int] id
      * @return Response
      */
-    public function sendFriendRequest(Request $request)
+    public function sendMatchRequest(Request $request)
     {
       $user = $request->user();
       $recipient = User::where('id', request('id'))->first();
+
+      if($user->isFriendWith($recipient)){
+        return response()->json("Already matched with user");
+      }
 
       if($user->befriend($recipient)!=false){
         return response()->json([        
@@ -164,7 +168,6 @@ class UsersController extends Controller
         'message' => 'Friend Request Sent'
       ]);
       }else {
-      //if lougout request failed
         return response()->json([
           'success' => false,
           'message' => 'Unable to Send Friend Request'
@@ -172,9 +175,54 @@ class UsersController extends Controller
       }
     }
 
-    public function getFriendRequests(Request $request){
+
+    public function getMatchRequests(Request $request){
       $user = $request->user();
       return response()->json($user->getPendingFriendships());
+    }
+
+
+    public function acceptMatchRequest(Request $request){
+      $user = $request->user();
+      $sender = User::where('id', request('id'))->first();
+
+      return response()->json($user->acceptFriendRequest($sender));
+    }
+
+
+    public function denyMatchRequest(Request $request){
+      $user = $request->user();
+      $sender = User::where('id', request('id'))->first();
+
+      return response()->json($user->denyFriendRequest($sender));
+    }
+
+
+    public function unmatch(Request $request){
+      $user = $request->user();
+      $friend = User::where('id', request('id'))->first();
+
+      if(($user->isFriendWith($friend))){
+        $user->unfriend($friend);
+        return response()->json([        
+        'success' => true,
+        'message' => 'Match Ended'
+      ]);
+      }else {
+        return response()->json([
+          'success' => false,
+          'message' => 'Unable to Unmatch'
+        ]);
+      }
+    }
+
+
+    // TODO: BLOCK AND UNBLOCK METHODS
+
+
+    public function getMatchedUsers(Request $request){
+      $users = $request->user();
+      return response()->json($user->getAcceptedFriendships());
     }
 
 }
