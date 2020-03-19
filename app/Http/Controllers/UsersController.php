@@ -156,7 +156,7 @@ class UsersController extends Controller
     public function sendFriendRequest(Request $request)
     {
       $user = $request->user();
-      $recipient = User::where('id', request('id'));
+      $recipient = User::where('id', request('id'))->first();
 
       if($user->befriend($recipient)!=false){
         return response()->json([        
