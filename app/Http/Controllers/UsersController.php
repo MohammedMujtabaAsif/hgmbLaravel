@@ -147,15 +147,21 @@ class UsersController extends Controller
       // TODO implement matches code
     }
 
-    public function sendFriendRequest(Request $request)
+
+    /**
+     * Send friend request to another user
+     * @param [int] id
+     * @return Response
+     */
+    public function sendFriendRequest(Request $request, $id)
     {
       $user = $request->user();
-      $recipient = User::where('email',request('id'))->first();
+      $recipient = User::where('id', $id);
 
       if($user->befriend($recipient)!=false){
         return respnse()->json([        
         'success' => true,
-        'message' => 'Friend Request Made'
+        'message' => 'Friend Request Sent'
       ]);
       }else {
       //if lougout request failed
