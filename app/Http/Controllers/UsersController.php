@@ -98,7 +98,6 @@ class UsersController extends Controller
       if (Auth::user()) {
         $user = Auth::user()->token();
         $user->revoke();
-        Auth::logout();
       //if logout request worked
         return response()->json([
           'success' => true,
