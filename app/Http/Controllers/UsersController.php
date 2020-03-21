@@ -98,6 +98,7 @@ class UsersController extends Controller
       if (Auth::user()) {
         $user = Auth::user()->token();
         $user->revoke();
+        Auth::logout();
       //if logout request worked
         return response()->json([
           'success' => true,
@@ -110,6 +111,26 @@ class UsersController extends Controller
           'success' => false,
           'message' => 'Unable to Logout'
         ]);
+      }
+    }
+
+
+    public function deleteAccount()
+    {
+      $user = User::find(Auth::user()->id);
+
+      Auth::logout();
+
+      if ($user->delete()) {
+          return response()->json([
+          'success'=>'true',
+          'message'=>'Your account has successfully been deleted!'
+          ]);
+      }else{
+        return response()->json([
+          'success'=>'false',
+          'message'=>'Failed to delete your account!'
+          ]);
       }
     }
 
@@ -131,7 +152,7 @@ class UsersController extends Controller
      *
      * @return [json] user object
      */
-    public function user(Request $request)
+    public function currentUser(Request $request)
     {
         return response()->json($request->user());
     }
@@ -222,7 +243,9 @@ class UsersController extends Controller
 
     public function getMatchedUsers(Request $request){
       $user = $request->user();
-      return response()->json($user->getFriends());
+      $friends = $user->getFriends();
+      
+      return response()->json($friends);
     }
 
 }

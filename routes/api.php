@@ -23,7 +23,8 @@ Route::group([
       'middleware' => 'auth:api'
     ], function() {
         Route::get('logout', 'UsersController@logout');
-        Route::get('user', 'UsersController@user');
+        Route::get('deleteAccount', 'UsersController@deleteAccount');
+        Route::get('currentUser', 'UsersController@currentUser');
         Route::get('allUsers', 'UsersController@allUsers');
         Route::get('matches', 'UsersController@allMatches');
         Route::post('sendMatchRequest', 'UsersController@sendMatchRequest');
