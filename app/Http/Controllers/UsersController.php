@@ -122,14 +122,14 @@ class UsersController extends Controller
       Auth::logout();
 
       if ($user->delete()) {
-          return response()->json([
-          'success'=> true,
-          'message'=>'Your account has successfully been deleted!'
-          ]);
+        return response()->json([
+          'success' => true,
+          'message' => 'Your account has been successfully deleted'
+      ]);
       }else{
         return response()->json([
-          'success'=> false,
-          'message'=>'Failed to delete your account!'
+          'success' => false,
+          'message' =>'Failed to delete your account!'
           ]);
       }
     }
