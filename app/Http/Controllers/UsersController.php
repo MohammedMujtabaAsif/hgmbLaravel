@@ -123,12 +123,12 @@ class UsersController extends Controller
 
       if ($user->delete()) {
           return response()->json([
-          'success'=>'true',
+          'success'=> true,
           'message'=>'Your account has successfully been deleted!'
           ]);
       }else{
         return response()->json([
-          'success'=>'false',
+          'success'=> false,
           'message'=>'Failed to delete your account!'
           ]);
       }
