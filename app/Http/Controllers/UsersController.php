@@ -118,8 +118,6 @@ class UsersController extends Controller
     {
       $user = User::find(Auth::user()->id);
 
-      logout();
-
       if ($user->delete()) {
         return response()->json([
           'success' => true,
