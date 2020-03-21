@@ -178,7 +178,7 @@ class UsersController extends Controller
 
     public function getMatchRequests(Request $request){
       $user = $request->user();
-      return response()->json($user->getPendingFriendships());
+      return response()->json($user->getFriendRequests());
     }
 
 
