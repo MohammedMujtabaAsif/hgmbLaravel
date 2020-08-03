@@ -50,15 +50,15 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function city(){
-        return $this->belongsTo(City::class);
+        return $this->hasOne(City::class);
     }
 
     public function gender(){
-        return $this->belongsTo(Gender::class);
+        return $this->hasOne(Gender::class);
     }
 
     public function maritalStatus(){
-        return $this->belongsTo(MaritalStatus::class);
+        return $this->hasOne(MaritalStatus::class);
     }
 
 
