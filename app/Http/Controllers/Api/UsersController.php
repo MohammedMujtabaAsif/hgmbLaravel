@@ -108,13 +108,13 @@ class UsersController extends Controller
     $users = auth()->user()->getAllFriendships();
 
     //TODO: Make SELECT query using User's preferences
-    $users = User::where('id', '!=', auth()->id())->where('adminApproved', 1)->where(auth()->user()->isFriendWith(),false)->get();
-    foreach($users as $user){
-      if($user->isFriendWith(auth()->user())){
+    $users = User::where('id', '!=', auth()->id())->where('adminApproved', 1)->where('adminBanned', 0)->get();
+    // foreach($users as $user){
+    //   if($user->isFriendWith(auth()->user())){
 
-      }
+    //   }
 
-    }
+    // }
 
     return response()->json($users);
   }
