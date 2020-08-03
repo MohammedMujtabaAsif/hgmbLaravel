@@ -60,6 +60,15 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
         {
+
+            $prefGender;
+
+            if($data['gender_id']==1){
+                $prefGender = 2;
+            }else{
+                $prefGender = 1;
+            }
+
             $validator = Validator::make($request->all(), [
             //Validate user's personal details
             'firstNames' => 'required|string',
@@ -93,10 +102,44 @@ class RegisterController extends Controller
                 ]);
             }
 
-            $input = $request->all();
-            $input['password'] = Hash::make($input['password']);            
-            $input['age'] = Carbon::parse($input['dob'])->diff(Carbon::now())->format('%y');
-            $user = User::create($input);
+            $user =  User::create([
+                // //User's personal details
+                'firstNames' => $validator['firstNames'],
+                'surname' => $validator['surname'],
+                'prefName'=> $validator['prefName'],
+                'email' => $validator['email'],
+                'password' => bcrypt($validator['password']),
+                'phoneNumber' => $validator['phoneNumber'],
+                'city_id' => (int) $validator['city_id'],
+                'gender_id' => (int) $validator['gender_id'],
+                'marital_status_id' => (int) $validator['marital_status_id'], 
+                'dob' => Carbon::createFromFormat('Y-m-d', input['dob']),
+                'age' => Carbon::parse($validator['dob'])->diff(Carbon::now())->format('%y'),
+                'numOfChildren' => $validator['numOfChildren'],
+                'bio' => $validator['bio'],
+                // TODO: imageAddress
+
+
+                //User's partner preferences
+                'prefMinAge' => (int) $validator['prefMinAge'],
+                'prefMaxAge' => (int) $validator['prefMaxAge'],
+                'prefMaxNumOfChildren' => (int) $validator['prefMaxNumOfChildren'],
+            ]);
+
+            $user->prefCities()->sync((int) $validator['prefCities']);
+            $user->prefGenders()->sync((int) $prefGender);
+            $user->prefMaritalStatuses()->sync((int) $validator['prefMaritalStatuses']);
+
+        //     $input = $request->all();
+        //     $input['password'] = Hash::make($input['password']);
+        //     $input['dob'] = Carbon::createFromFormat('Y-m-d', input['dob']);
+        //     $input['age'] = Carbon::parse($input['dob'])->diff(Carbon::now())->format('%y');
+        //     $user = User::create($input);
+
+
+        // $user->prefCities()->sync((int) $data['prefCities']);
+        // $user->prefGenders()->sync((int) $prefGender);
+        // $user->prefMaritalStatuses()->sync((int) $data['prefMaritalStatuses']);
 
             $token['token'] = $user->createToken('appToken')->accessToken;
 
