@@ -2,247 +2,77 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Demency\Friendships\Traits\Friendable;
-use Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Validator;
 use App\User;
+use Redirect;
+
+
 
 class UsersController extends Controller
 {
 
-  
     /**
-     * Create user
+     * Display the specified resource.
      *
-     * @param  [string] name
-     * @param  [string] email
-     * @param  [string] password
-     * @param  [string] password_confirmation
-     * @return [string] message
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
      */
-    public function signup(Request $request)
-        {
-            $validator = Validator::make($request->all(), [
-                'firstNames' => 'required|string',
-                'surname' => 'required|string',
-                'prefName'=>'required|string',
-                'email' => 'required|string|email|unique:users',
-                'password' => 'required|string|confirmed',
-                'phoneNumber' => 'required|unique:users|regex:/(0)[0-9]{10}/',
-                'city' => 'required|string',
-                'maritalStatus'=>'required|string'
-            ]);
+    public function show(User $user)
+    {
+        $userProf = Auth::user();
+        return view("users/publicProfile", ['userProf' => $userProf]);
+    }
 
-            if ($validator->fails()) {
-                return response()->json([
-                'success' => false,
-                'message' => $validator->errors(),
-                ], 401);
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(User $user)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, User $user)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy()
+    {
+        $user = User::find(Auth::user()->id);
+        Auth::logout();
+
+        try{
+            $user->prefCities()->detach();
+            $user->prefGenders()->detach();
+            $user->prefMaritalStatuses()->detach();
+        }finally{
+        
+            if ($user->delete()) {
+                session()->flash('status.level', 'success');
+                session()->flash('status.message', 'Your account has been deleted!');
+                return Redirect::route('welcome');
             }
-
-            $input = $request->all();
-            $input['password'] = bcrypt($input['password']);
-            $user = User::create($input);
-
-            $success['token'] = $user->createToken('appToken')->accessToken;
-
-            return response()->json([
-                'success' => true,
-                'token' => $success,
-                'user' => $user
-            ]);
         }
-
-
-    /**
-     * Login user and create token
-     *
-     * @param  [string] email
-     * @param  [string] password
-     * @param  [boolean] remember_me
-     * @return [string] access_token
-     * @return [string] token_type
-     * @return [string] expires_at
-     */
-    public function login()
-    {
-        if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
-            $user = Auth::user();
-            $success['token'] = $user->createToken('appToken')->accessToken;
-           //if authentication successfull
-            return response()->json([
-              'success' => true,
-              'token' => $success,
-              'user' => $user
-          ]);
-        } else {
-       //if authentication is unsuccessfull
-          return response()->json([
-            'success' => false,
-            'message' => 'Invalid Email or Password',
-        ], 401);
-        }
-    }
-
-  
-    /**
-     * Logout user (Revoke the token)
-     *
-     * @return [string] message
-     */
-    public function logout()
-    {
-      //if user is logged in
-      if (Auth::user()) {
-        $user = Auth::user()->token();
-        $user->revoke();
-      //if logout request worked
-        return response()->json([
-          'success' => true,
-          'message' => 'Logout success'
-      ]);
-      }
-      else {
-      //if lougout request failed
-        return response()->json([
-          'success' => false,
-          'message' => 'Unable to Logout'
-        ]);
-      }
-    }
-
-
-    public function deleteAccount()
-    {
-      $user = User::find(Auth::user()->id);
-
-      if ($user->delete()) {
-        return response()->json([
-          'success' => true,
-          'message' => 'Your account has been successfully deleted'
-      ]);
-      }else{
-        return response()->json([
-          'success' => false,
-          'message' =>'Failed to delete your account!'
-          ]);
-      }
-    }
-
-
-    /**
-     * Show a list of all of the application's users.
-     *
-     * @return Response
-     */
-    public function allUsers()
-    {
-        $users = User::where('id', '!=', auth()->id())->get();
-        return response()->json($users);
-    }
-
-
-    /**
-     * Get the authenticated User
-     *
-     * @return [json] user object
-     */
-    public function currentUser(Request $request)
-    {
-        return response()->json($request->user());
-    }
-
-
-    /**
-     * Show a list of all of the user's matches.
-     *
-     * @return Response
-     */
-    public function allMatches()
-    {
-      // TODO implement matches code
-    }
-
-
-    /**
-     * Send friend request to another user
-     * @param [int] id
-     * @return Response
-     */
-    public function sendMatchRequest(Request $request)
-    {
-      $user = $request->user();
-      $recipient = User::where('id', request('id'))->first();
-
-      if($user->isFriendWith($recipient)){
-        return response()->json("Already matched with user");
-      }
-
-      if($user->befriend($recipient)!=false){
-        return response()->json([        
-        'success' => true,
-        'message' => 'Friend Request Sent'
-      ]);
-      }else {
-        return response()->json([
-          'success' => false,
-          'message' => 'Unable to Send Friend Request'
-        ]);
-      }
-    }
-
-
-    public function getMatchRequests(Request $request){
-      $user = $request->user();
-      return response()->json($user->getFriendRequests());
-    }
-
-
-    public function acceptMatchRequest(Request $request){
-      $user = $request->user();
-      $sender = User::where('id', request('id'))->first();
-
-      return response()->json($user->acceptFriendRequest($sender));
-    }
-
-
-    public function denyMatchRequest(Request $request){
-      $user = $request->user();
-      $sender = User::where('id', request('id'))->first();
-
-      return response()->json($user->denyFriendRequest($sender));
-    }
-
-
-    public function unmatch(Request $request){
-      $user = $request->user();
-      $friend = User::where('id', request('id'))->first();
-
-      if(($user->isFriendWith($friend))){
-        $user->unfriend($friend);
-        return response()->json([        
-        'success' => true,
-        'message' => 'Match Ended'
-      ]);
-      }else {
-        return response()->json([
-          'success' => false,
-          'message' => 'Unable to Unmatch'
-        ]);
-      }
-    }
-
-
-    // TODO: BLOCK AND UNBLOCK METHODS
-
-
-    public function getMatchedUsers(Request $request){
-      $user = $request->user();
-      $friends = $user->getFriends();
-      
-      return response()->json($friends);
     }
 
 }

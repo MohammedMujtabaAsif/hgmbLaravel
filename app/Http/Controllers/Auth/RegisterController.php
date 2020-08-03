@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class RegisterController extends Controller
 {
@@ -50,9 +51,28 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            //Validate user's personal details
+            'firstNames' => 'required|string',
+            'surname' => 'required|string',
+            'prefName'=>'required|string',
+            'email' => 'required|string|email|unique:users',
+            'password' => 'required|string|confirmed',
+            'phoneNumber' => 'required|unique:users|max:11|regex:/(0)[0-9]{10}/|string',
+            'city_id' => 'required|integer',
+            'gender_id'=>'required|integer',
+            'marital_status_id'=>'required|integer',
+            'dob'=>'required|date|before:18 years ago',
+            'numOfChildren'=>'integer',
+            'bio'=>'required|string|max:1000',
+            'image' => 'file|max:5000',
+
+            //Validate user's partner preferences
+            'prefCities' => 'required|integer|array|distinct',
+            'prefGenders'=>'required|integer|array|distinct',
+            'prefMaritalStatuses'=>'required|integer|array|distinct',
+            'prefMinAge'=>'required|integer|min:18|lt:prefMaxAge',
+            'prefMaxAge'=>'required|integer|min:20|gt:prefMinAge',
+            'prefMaxNumOfChildren'=>'required|integer',
         ]);
     }
 
@@ -64,10 +84,41 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
+        $prefGender;
+        if($data['gender_id']==1){
+            $prefGender = 2;
+        }else{
+            $prefGender = 1;
+        }
+
+        $user =  User::create([
+            // //User's personal details
+            'firstNames' => $data['firstNames'],
+            'surname' => $data['surname'],
+            'prefName'=> $data['prefName'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => bcrypt($data['password']),
+            'phoneNumber' => $data['phoneNumber'],
+            'city_id' => (int) $data['city_id'],
+            'gender_id' => (int) $data['gender_id'],
+            'marital_status_id' => (int) $data['marital_status_id'], 
+            'dob' => $data['dob'],
+            'age' => Carbon::parse($data['dob'])->diff(Carbon::now())->format('%y'),
+            'numOfChildren' => $data['numOfChildren'],
+            'bio' => $data['bio'],
+            //imageAddress NOT COMPLETE
+
+
+            //User's partner preferences
+            'prefMinAge' => (int) $data['prefMinAge'],
+            'prefMaxAge' => (int) $data['prefMaxAge'],
+            'prefMaxNumOfChildren' => (int) $data['prefMaxNumOfChildren'],
         ]);
+
+        $user->prefCities()->sync((int) $data['prefCities']);
+        $user->prefGenders()->sync((int) $prefGender);
+        $user->prefMaritalStatuses()->sync((int) $data['prefMaritalStatuses']);
+
+        return $user;
     }
 }

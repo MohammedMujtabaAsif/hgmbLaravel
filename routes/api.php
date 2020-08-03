@@ -1,6 +1,7 @@
 <?php
-
+namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
+use Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,29 +14,47 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::group([
-    'prefix' => 'auth'
-], function () {
-    Route::post('login', 'UsersController@login');
-    Route::post('signup', 'UsersController@signup');
-  
-    Route::group([
-      'middleware' => 'auth:api'
-    ], function() {
-        Route::get('logout', 'UsersController@logout');
-        Route::get('deleteAccount', 'UsersController@deleteAccount');
-        Route::get('currentUser', 'UsersController@currentUser');
-        Route::get('allUsers', 'UsersController@allUsers');
-        Route::get('matches', 'UsersController@allMatches');
-        Route::post('sendMatchRequest', 'UsersController@sendMatchRequest');
-        Route::get('getMatchRequests','UsersController@getMatchRequests');
-        Route::post('acceptMatchRequest', 'UsersController@acceptMatchRequest');
-        Route::post('denyMatchRequest', 'UsersController@denyMatchRequest');
-        Route::post('unmatch', 'UsersController@unmatch');
-        Route::get('getMatchedUsers', 'UsersController@getMatchedUsers');
+// Allow any user to reach these routes
+Route::post('register', 'RegisterController@register')->name('user.register');
+Route::post('login', 'Api\LoginController@login')->name('user.login');
+
+// Password reset routes
+Route::post('password/sendResetEmail', 'Auth\ForgotPasswordController@sendResetLinkEmail');
+// Route::post('password/resetPassword', 'Api\ResetPasswordController@reset');
+
+Route::get('email/verify/{id}/{hash}', 'Api\VerificationController@verify')->name('verification.verify');
+
+Route::group(['middleware' => ['auth:api']], function(){
+    // Allow users who are authenticated to access these routes
+    Route::get('logout', 'Api\LoginController@logout');
+    Route::get('deleteAccount', 'UsersController@deleteAccount');
+
+    // Email Verification routes
+    Route::get('email/resend', 'Api\VerificationController@resend')->middleware('auth:api')->name('verification.resend');
+
+        Route::group(['middleware' => ['verified', 'approved']], function () {
+            // Only allow user's who are admin approved and
+            // have verified their email address to reach these routes
+            Route::get('user', 'Api\UsersController@currentUser');
+            Route::get('allOtherUsers', 'Api\UsersController@allOtherUsers');
+            // Route::get('getMatches', 'Api\UsersController@allMatches');
+            Route::get('getMatchedUsers', 'Api\UsersController@getMatchedUsers');
+            Route::post('sendMatchRequest', 'Api\UsersController@sendMatchRequest');
+            Route::get('getMatchRequests','Api\UsersController@getMatchRequests');
+            Route::post('acceptMatchRequest', 'Api\UsersController@acceptMatchRequest');
+            Route::post('denyMatchRequest', 'Api\UsersController@denyMatchRequest');
+            Route::post('unmatch', 'Api\UsersController@unmatch');
+            Route::post('blockUser', 'Api\UsersController@blockUser');
+            Route::post('unblockUser', 'Api\UsersController@unblockUser');
+            
+            Route::apiResources(['appointments' => 'Api\AppointmentsController']);        
     });
 });
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
+//GET AUTHENTICATED USER (skip verified middleware)
+// 
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+

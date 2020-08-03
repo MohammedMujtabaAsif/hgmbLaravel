@@ -7,8 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Demency\Friendships\Traits\Friendable;
+use App\Notifications\ResetPassword as ResetPasswordNotification;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, Notifiable, Friendable;
 
@@ -18,7 +19,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstNames', 'surname', 'prefName', 'email', 'password', 'phoneNumber', 'city', 'maritalStatus', 'gender', 'minPrefAge', 'maxPrefAge', 'dob', 'numOfChildren', 'bio', 'userType'
+        // User's personal details
+        'firstNames', 'surname', 'prefName', 'email', 'password', 'phoneNumber', 'city_id', 'gender_id', 'marital_status_id', 'dob', 'age', 'numOfChildren', 'bio', 'imageAddress',
+        
+        'prefMinAge', 'prefMaxAge', 'prefMaxNumOfChildren', 'prefMaritalStatuses',
+        //  'prefCities',  'prefGenders',
     ];
 
     /**
@@ -38,4 +43,40 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function city(){
+        return $this->belongsTo(City::class);
+    }
+
+    public function gender(){
+        return $this->belongsTo(Gender::class);
+    }
+
+    public function maritalStatus(){
+        return $this->belongsTo(MaritalStatus::class);
+    }
+
+
+    public function prefCities()
+    {
+        return $this->belongsToMany(City::class);
+    }
+
+
+    public function prefGenders()
+    {
+        return $this->belongsToMany(Gender::class);
+    }
+
+
+    public function prefMaritalStatuses()
+    {
+        return $this->belongsToMany(MaritalStatus::class);
+    }
+
 }
