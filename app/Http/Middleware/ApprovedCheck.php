@@ -23,8 +23,8 @@ class ApprovedCheck
         }
         elseif($request->user()->adminBanned == 1)
         {
-            if(!empty($request->user()->adminUnapprovedMessage))
-                $message = $request->user()->adminUnapprovedMessage;
+            if(!empty($request->user()->adminBannedMessage))
+                $message = "Banned: " . $request->user()->adminBannedMessage;
             else
                 $message = "Banned by Admins";
             $code = 403;
@@ -32,7 +32,7 @@ class ApprovedCheck
         else
         {
             if(!empty($request->user()->adminUnapprovedMessage))
-                $message = $request->user()->adminUnapprovedMessage;
+                $message = "Unapproved: " . $request->user()->adminUnapprovedMessage;
             else
                 $message = "Awaiting Admin Approval";
             $code = 401;
