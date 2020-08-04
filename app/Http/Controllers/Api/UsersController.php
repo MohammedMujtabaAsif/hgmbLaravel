@@ -129,8 +129,7 @@ class UsersController extends Controller
   {   
     
     $user = $request->user();
-    $userDetails = [
-      'user' => $user->only([
+    $userCleaned = $user->only([
         'id',
         'firstNames',
         'surname',
@@ -144,8 +143,10 @@ class UsersController extends Controller
         'prefMinAge',
         'prefMaxAge',
         'prefMaxnumberOfChildren',
-      ]),
-
+      ]);
+      
+    $userDetails = [
+      'userDetails' => $userCleaned,
       'gender' => $user->gender,
       'maritalStatus' => $user->maritalStatus,
       'prefCities' => $user->prefCities,
