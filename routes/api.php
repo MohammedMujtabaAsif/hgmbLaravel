@@ -15,7 +15,7 @@ use Route;
 */
 
 // Allow any user to reach these routes
-Route::post('register', 'RegisterController@register')->name('user.register');
+Route::post('register', 'Api\RegisterController@register')->name('user.register');
 Route::post('login', 'Api\LoginController@login')->name('user.login');
 
 // Password reset routes
