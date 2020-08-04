@@ -75,7 +75,10 @@ class UsersController extends Controller
   //     }
 
   public function verificationCheck(){
-    return response()->json([]);
+    return response()->json([
+      'success' -> true,
+      'message' => 'authorised',
+    ]);
   }
 
 
@@ -150,7 +153,20 @@ class UsersController extends Controller
       ]);
 
     $userDetails = [
-      'userDetails' => $userCleaned,
+      // 'userDetails' => $userCleaned['id'],
+      'id' => $userCleaned['id'],
+      'firstNames' => $userCleaned['firstNames'],
+      'surname' => $userCleaned['surname'],
+      'prefName' => $userCleaned['prefName'],
+      'email' => $userCleaned['email'],
+      'phoneNumber' => $userCleaned['phoneNumber'],
+      'dob' => $userCleaned['dob'],
+      'age' => $userCleaned['age'],
+      'numOfChildren' => $userCleaned['numOfChildren'],
+      'bio' => $userCleaned['bio'],
+      'prefMinAge' => $userCleaned['prefMinAge'],
+      'prefMaxAge' => $userCleaned['prefMaxAge'],
+      'prefMaxNumOfChildren' => $userCleaned['prefMaxNumOfChildren'],
       'gender' => $user->gender,
       'maritalStatus' => $user->maritalStatus,
       'prefCities' => $user->prefCities,
