@@ -14,6 +14,8 @@ class Gender extends Model
     protected $fillable = [
        'name',
     ];
+    
+    protected $hidden = ['pivot'];
 
     public function users()
     {

@@ -32,7 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'pivot',
     ];
 
     /**
@@ -64,19 +64,19 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function prefCities()
     {
-        return $this->belongsToMany(City::class)->select(['city_id', 'user_id', 'name']);
+        return $this->belongsToMany(City::class)->select(['city_id', 'name']);
     }
 
 
     public function prefGenders()
     {
-        return $this->belongsToMany(Gender::class)->select(['gender_id', 'user_id', 'name']);
+        return $this->belongsToMany(Gender::class)->select(['gender_id','name']);
     }
 
 
     public function prefMaritalStatuses()
     {
-        return $this->belongsToMany(MaritalStatus::class)->select(['marital_status_id', 'user_id', 'name']);
+        return $this->belongsToMany(MaritalStatus::class)->select(['marital_status_id', 'name']);
     }
 
 }

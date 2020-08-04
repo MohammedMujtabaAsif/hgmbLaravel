@@ -15,6 +15,8 @@ class MaritalStatus extends Model
        'name',
     ];
 
+    protected $hidden = ['pivot'];
+
     public function users()
     {
         return $this->belongsToMany(User::class);
