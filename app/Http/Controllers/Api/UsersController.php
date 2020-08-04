@@ -142,9 +142,9 @@ class UsersController extends Controller
         'bio',
         'prefMinAge',
         'prefMaxAge',
-        'prefMaxnumberOfChildren',
+        'prefMaxNumOfChildren',
       ]);
-      
+
     $userDetails = [
       'userDetails' => $userCleaned,
       'gender' => $user->gender,
