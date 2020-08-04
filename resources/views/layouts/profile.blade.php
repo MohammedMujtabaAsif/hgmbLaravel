@@ -147,7 +147,7 @@
 
                                 <a class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1"><strong>Preferred Cities</strong></h5>
+                                        <h5 class="mb-1"><strong>Cities</strong></h5>
                                     </div>
                                     @foreach($userProf->prefCities as $city)
                                     <p class="mb-1">{{$city->name}}</p>
@@ -157,7 +157,7 @@
 
                                 <a class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1"><strong>Preferred Genders</strong></h5>
+                                        <h5 class="mb-1"><strong>Gender</strong></h5>
                                     </div>
                                     @foreach($userProf->prefGenders as $gender)
                                     <p class="mb-1">{{$gender->name}}</p>
@@ -167,13 +167,28 @@
 
                                 <a class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1"><strong>Preferred Marital Statuses</strong></h5>
+                                        <h5 class="mb-1"><strong>Marital Statuses</strong></h5>
                                     </div>
                                     @foreach($userProf->prefMaritalStatuses as $ms)
                                     <p class="mb-1">{{$ms->name}}</p>
 
                                     @endforeach
                                 </a>
+
+                                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1"><strong>Number of Children</strong></h5>
+                                    </div>
+                                    <p class="mb-1">{{$userProf->prefMaxNumOfChildren}}</p>
+                                </a>
+
+                                <a class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1"><strong>Age Range</strong></h5>
+                                    </div>
+                                    <p class="mb-1">{{$userProf->prefMinAge}}   -  {{$userProf->prefMaxAge}}</p>
+                                </a>
+
                             </div>
 
                         @endif
