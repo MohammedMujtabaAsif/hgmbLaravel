@@ -22,20 +22,22 @@ Route::post('login', 'Api\LoginController@login')->name('user.login');
 Route::post('password/sendResetEmail', 'Auth\ForgotPasswordController@sendResetLinkEmail');
 // Route::post('password/resetPassword', 'Api\ResetPasswordController@reset');
 
+// Email Verification route
 Route::get('email/verify/{id}/{hash}', 'Api\VerificationController@verify')->name('verification.verify');
 
 Route::group(['middleware' => ['auth:api']], function(){
     // Allow users who are authenticated to access these routes
     Route::get('logout', 'Api\LoginController@logout');
     Route::get('deleteAccount', 'UsersController@deleteAccount');
-
-    // Email Verification routes
+    Route::get('user', 'Api\UsersController@currentUser');
+    
+    // Resend Email Verification route
     Route::get('email/resend', 'Api\VerificationController@resend')->middleware('auth:api')->name('verification.resend');
 
         Route::group(['middleware' => ['verified', 'approved']], function () {
             // Only allow user's who are admin approved and
             // have verified their email address to reach these routes
-            Route::get('user', 'Api\UsersController@currentUser');
+            Route::get('/verify', 'Api\UsersController@verificationCheck');
             Route::get('allOtherUsers', 'Api\UsersController@allOtherUsers');
             // Route::get('getMatches', 'Api\UsersController@allMatches');
             Route::get('getMatchedUsers', 'Api\UsersController@getMatchedUsers');
@@ -47,7 +49,7 @@ Route::group(['middleware' => ['auth:api']], function(){
             Route::post('blockUser', 'Api\UsersController@blockUser');
             Route::post('unblockUser', 'Api\UsersController@unblockUser');
             
-            Route::apiResources(['appointments' => 'Api\AppointmentsController']);        
+            // Route::apiResources(['appointments' => 'Api\AppointmentsController']);        
     });
 });
 

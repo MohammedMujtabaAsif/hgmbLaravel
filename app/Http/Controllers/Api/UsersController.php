@@ -74,6 +74,10 @@ class UsersController extends Controller
   //         ]);
   //     }
 
+  public function verificationCheck(){
+    return response()->json([]);
+  }
+
 
   public function deleteAccount()
   {
