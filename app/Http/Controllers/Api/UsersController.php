@@ -130,7 +130,7 @@ class UsersController extends Controller
     
     $user = $request->user();
     $userDetails = [
-      $user->only([
+      'user' => $user->only([
         'id',
         'firstNames',
         'surname',
@@ -145,7 +145,7 @@ class UsersController extends Controller
         'prefMaxAge',
         'prefMaxnumberOfChildren',
       ]),
-      
+
       'gender' => $user->gender,
       'maritalStatus' => $user->maritalStatus,
       'prefCities' => $user->prefCities,
