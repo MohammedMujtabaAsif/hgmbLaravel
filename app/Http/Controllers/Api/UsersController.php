@@ -76,7 +76,7 @@ class UsersController extends Controller
 
   public function verificationCheck(){
     return response()->json([
-      'success' -> true,
+      'success' => true,
       'message' => 'authorised',
     ]);
   }
