@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             MaritalStatusesTableSeeder::class,
             GendersTableSeeder::class,
             CitiesTableSeeder::class,
-            UserTableSeeder::class,
+            UsersTableSeeder::class,
             ]);
     }
 }
