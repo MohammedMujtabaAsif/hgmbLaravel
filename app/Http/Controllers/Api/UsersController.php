@@ -129,19 +129,40 @@ class UsersController extends Controller
   {   
     
     $user = $request->user();
-    return response()->json($user);
+    $userDetails = [
+      $user->only([
+        'id',
+        'firstNames',
+        'surname',
+        'prefName',
+        'email',
+        'phoneNumber',
+        'dob',
+        'age',
+        'numOfChildren',
+        'bio',
+        'prefMinAge',
+        'prefMaxAge',
+        'prefMaxnumberOfChildren',
+      ]),
+      
+      'gender' => $user->gender,
+      'maritalStatus' => $user->maritalStatus,
+      'prefCities' => $user->prefCities,
+      'prefGenders' => $user->prefGenders,
+      'prefMaritalStatuses' => $user->prefMaritalStatuses,
+      ];
 
 
-    //   $prefCities = $user->prefCities->pluck('name');
-    //   $prefGenders = $user->prefGenders->pluck('name');
-    //   $prefMaritalStatuses = $user->prefMaritalStatuses->pluck('name');
-
-    // return response()->json([
-    //   'user' => $userDetails,
-    //   'prefCities' => $prefCities,
-    //   'prefGenders' => $prefGenders,
-    //   'prefMaritalStatuses' => $prefMaritalStatuses,
-    // ]);
+    return response()->json([
+      'user' => $userDetails,
+      // $request->user()->city,
+      // $request->user()->gender,
+      // $request->user()->maritalStatus,
+      // $request->user()->prefCities,
+      // $request->user()->prefGenders,
+      // $request->user()->prefMaritalStatuses,
+    ]);
   }
 
 
