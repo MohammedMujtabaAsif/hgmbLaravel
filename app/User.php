@@ -50,33 +50,33 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function city(){
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(City::class)->select('name');
     }
 
     public function gender(){
-        return $this->belongsTo(Gender::class);
+        return $this->belongsTo(Gender::class)->select('name');
     }
 
     public function maritalStatus(){
-        return $this->belongsTo(MaritalStatus::class);
+        return $this->belongsTo(MaritalStatus::class)->select('name');
     }
 
 
     public function prefCities()
     {
-        return $this->belongsToMany(City::class);
+        return $this->belongsToMany(City::class)->select(['city_id', 'user_id', 'name']);
     }
 
 
     public function prefGenders()
     {
-        return $this->belongsToMany(Gender::class);
+        return $this->belongsToMany(Gender::class)->select(['gender_id', 'user_id', 'name']);
     }
 
 
     public function prefMaritalStatuses()
     {
-        return $this->belongsToMany(MaritalStatus::class);
+        return $this->belongsToMany(MaritalStatus::class)->select(['marital_status_id', 'user_id', 'name']);
     }
 
 }
