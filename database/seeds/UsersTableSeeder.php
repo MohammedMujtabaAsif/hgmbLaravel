@@ -54,9 +54,9 @@ class UsersTableSeeder extends Seeder
             ]);
 
                     
-            $user->prefCities()->sync($faker->numberBetween($min = 0, $max = 2));
-            $user->prefGenders()->sync($faker->numberBetween($min = 0, $max = 1));
-            $user->prefMaritalStatuses()->sync($faker->numberBetween($min = 0, $max = 2));
+            $user->prefCities()->sync($faker->numberBetween($min = 1, $max = 3));
+            $user->prefGenders()->sync($faker->numberBetween($min = 1, $max = 2));
+            $user->prefMaritalStatuses()->sync($faker->numberBetween($min = 1, $max = 3));
 
             $user->save();
         }
