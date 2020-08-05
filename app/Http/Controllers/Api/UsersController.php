@@ -117,11 +117,14 @@ class UsersController extends Controller
     //TODO: Make SELECT query using User's preferences
     $users = User::select([
         'id',
-        // 'firstNames',
-        // 'surname',
+        'firstNames',
+        'surname',
         'prefName',
-        // 'email',
-        // 'phoneNumber',
+        'email',
+        'phoneNumber',
+        'gender_id',
+        'city_id',
+        'marital_status_id',
         'dob',
         'age',
         'numOfChildren',
@@ -129,15 +132,35 @@ class UsersController extends Controller
         'prefMinAge',
         'prefMaxAge',
         'prefMaxNumOfChildren',
-      ])->where('id', '!=', auth()->id())->where('adminApproved', 1)->where('adminBanned', 0)->get();
-    foreach($users as $user){
+      ])->where('id', '!=', auth()->id())->where('adminBanned', 0)->get();
 
-      $user->gender;
-      $user->city;
-      $user->maritalStatus;
-      $user->prefCities;
-      $user->prefGenders;
-      $user->prefMaritalStatuses;
+      $cleanUsers = array();
+      
+      foreach($users as $user){
+        $newUser = [
+        // 'userDetails' => $userCleaned['id'],
+        'id' => $user['id'],
+        'firstNames' => $user['firstNames'],
+        'surname' => $user['surname'],
+        'prefName' => $user['prefName'],
+        'email' => $user['email'],
+        'phoneNumber' => $user['phoneNumber'],
+        'dob' => $user['dob'],
+        'age' => $user['age'],
+        'numOfChildren' => $user['numOfChildren'],
+        'bio' => $user['bio'],
+        'prefMinAge' => $user['prefMinAge'],
+        'prefMaxAge' => $user['prefMaxAge'],
+        'prefMaxNumOfChildren' => $user['prefMaxNumOfChildren'],
+        'gender' => $user->gender,
+        'city' => $user->city,
+        'maritalStatus' => $user->maritalStatus,
+        'prefCities' => $user->prefCities,
+        'prefGenders' => $user->prefGenders,
+        'prefMaritalStatuses' => $user->prefMaritalStatuses,
+        ];        
+
+        array_push($cleanUsers, $newUser);
     }
     // foreach($users as $user){
     //   if($user->isFriendWith(auth()->user())){
@@ -146,7 +169,7 @@ class UsersController extends Controller
 
     // }
 
-    return response()->json($users);
+    return response()->json($cleanUsers);
   }
 
 
