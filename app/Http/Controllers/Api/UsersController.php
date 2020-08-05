@@ -115,8 +115,23 @@ class UsersController extends Controller
     $users = auth()->user()->getAllFriendships();
 
     //TODO: Make SELECT query using User's preferences
-    $users = User::where('id', '!=', auth()->id())->where('adminApproved', 1)->where('adminBanned', 0)->get();
+    $users = User::select([
+        'id',
+        // 'firstNames',
+        // 'surname',
+        'prefName',
+        // 'email',
+        // 'phoneNumber',
+        'dob',
+        'age',
+        'numOfChildren',
+        'bio',
+        'prefMinAge',
+        'prefMaxAge',
+        'prefMaxNumOfChildren',
+      ])->where('id', '!=', auth()->id())->where('adminApproved', 1)->where('adminBanned', 0)->get();
     foreach($users as $user){
+
       $user->gender;
       $user->city;
       $user->maritalStatus;
