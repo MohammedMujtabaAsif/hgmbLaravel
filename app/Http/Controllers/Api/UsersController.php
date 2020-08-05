@@ -134,7 +134,7 @@ class UsersController extends Controller
         'prefMaxAge',
         'prefMaxNumOfChildren',
       ])
-      
+
       ->where('id', '!=', auth()->id())
       ->where('adminBanned', 0)
 
@@ -192,10 +192,10 @@ class UsersController extends Controller
       'prefMaxNumOfChildren' => $userCleaned['prefMaxNumOfChildren'],
       'gender' => $user->gender,
       'city' => $user->city,
-      'maritalStatus' => $user->maritalStatus,
-      'prefCities' => $user->prefCities,
-      'prefGenders' => $user->prefGenders,
-      'prefMaritalStatuses' => $user->prefMaritalStatuses,
+      'marital_status' => $user->maritalStatus,
+      'pref_cities' => $user->prefCities,
+      'pref_genders' => $user->prefGenders,
+      'pref_marital_statuses' => $user->prefMaritalStatuses,
       ];
 
 
@@ -218,14 +218,14 @@ class UsersController extends Controller
     */
   public function getMatchedUsers(Request $request){
     $user = $request->user();
-    $friends = $user->getFriends();
+    $friends = $user->getFriends(10, 'simple');
     
-    // if matches are found return them as JSON
-    if($friends === [])
-      return response()->json($friends);
+    if(count($friends) === 0)
     // if no matches are found, return a message 
-    else
       return response()->json(['message' => 'No Matches']);
+    else
+    // if matches are found return them as JSON
+      return response()->json([$friends]);
   }
 
 
@@ -239,28 +239,50 @@ class UsersController extends Controller
   public function sendMatchRequest(Request $request)
   {
     $user = $request->user();
-    $recipient = User::where('id', $request('id'))->first();
+    $recipient = User::where('id', $request['id'])->first();
 
     //Check match sender is not already matched with send
     if($user->isFriendWith($recipient)){
       return response()->json([
         'success' => false,
-        'message' => 'Already Matched with User'
+        'message' => 'Already Matched with ' . $recipient->prefName,
       ]);
     }
 
-    if($user->befriend($recipient)!=false){
-      return response()->json([        
-        'success' => true,
-        'message' => 'Friend Request Sent'
-      ]);
-    }
-    else {
+    elseif($user->isBlockedBy($recipient)){
       return response()->json([
         'success' => false,
-        'message' => 'Unable to Send Friend Request'
+        'message' => $recipient->prefName . ' has Blocked You',
       ]);
     }
+
+    elseif($user->hasSentFriendRequestTo($recipient)){
+        return response()->json([
+        'success' => false,
+        'message' => 'You Have Already Sent a Match Request to ' . $recipient->prefName,
+      ]);
+    }
+
+    elseif($user->hasFriendRequestFrom($recipient)){
+      $user->befriend($recipient);
+      return response()->json([        
+        'success' => true,
+        'message' => 'You Matched with ' . $recipient->prefName,
+      ]);
+    }
+
+    elseif($user->befriend($recipient)==true){
+      return response()->json([        
+        'success' => true,
+        'message' => 'Match Sent to ' . $recipient->prefName,
+      ]);
+    }
+    
+    return response()->json([
+      'success' => false,
+      'message' => 'Unable to Send Match Request to ' . $recipient->prefName,
+    ]);
+    
   }
 
 
@@ -270,11 +292,11 @@ class UsersController extends Controller
     * @return Response
     */
   public function getMatchRequests(Request $request){
-    $matchRequests = $request->user()->getFriendRequests();
+    $matchRequests = $request->user()->getFriendRequests($perPage = 10);
 
-    if(empty($matchRequests)){
+    if(count($matchRequests) === 0){
       return response()->json([
-        'message' => 'No matches found',
+        'message' => 'No Matches Found',
       ]);
     }
 
@@ -291,7 +313,12 @@ class UsersController extends Controller
     $user = $request->user();
     $sender = User::where('id', request('id'))->first();
 
-    return response()->json($user->acceptFriendRequest($sender));
+    if($user->acceptFriendRequest($sender)){
+      return response()->json(['success' => true, 'message' => 'Accepted Match Request from ' . $sender->prefName], 200);
+    }
+    
+    return response()->json(['success' => false, 'message' => 'Failed to Accept Match Request from ' . $sender->prefName]);
+
   }
 
 
@@ -304,7 +331,11 @@ class UsersController extends Controller
     $user = $request->user();
     $sender = User::where('id', request('id'))->first();
 
-    return response()->json($user->denyFriendRequest($sender));
+    if($user->denyFriendRequest($sender)){
+      return response()->json(['success' => true, 'message' => 'Denied Match Request from ' . $sender->prefName], 200);
+    }
+
+    return response()->json(['success' => false, 'message' => 'Failed to Deny Match Request from ' . $sender->prefName]);
   }
 
 
@@ -318,18 +349,25 @@ class UsersController extends Controller
     $friend = User::where('id', request('id'))->first();
 
     if(($user->isFriendWith($friend))){
-      $user->unfriend($friend);
+
+      if($user->unfriend($friend)){
+        return response()->json([        
+          'success' => true,
+          'message' => 'Match Ended'
+        ]);
+      }
+
       return response()->json([        
-        'success' => true,
-        'message' => 'Match Ended'
-      ]);
-    }
-    else {
-      return response()->json([
         'success' => false,
-        'message' => 'Unable to Unmatch'
+        'message' => 'Failed to Unmatch'
       ]);
     }
+
+    return response()->json([
+      'success' => false,
+      'message' => 'You must match with ' . $friend->prefName . ' before unmatching'
+    ]);
+    
   }
 
 
@@ -348,12 +386,12 @@ class UsersController extends Controller
         'message' => 'User Blocked'
       ]);
     }
-    else {
-      return response()->json([
-        'success' => false,
-        'message' => 'Unable to Block'
-      ]);
-    }
+
+    return response()->json([
+      'success' => false,
+      'message' => 'Unable to Block'
+    ]);
+    
   }
 
 
@@ -369,7 +407,7 @@ class UsersController extends Controller
     if($user->unblockFriend($userToUnblock)){
       return response()->json([        
         'success' => true,
-        'message' => 'User Unblocked.'
+        'message' => 'User Unblocked'
       ]);
     }
     else {
