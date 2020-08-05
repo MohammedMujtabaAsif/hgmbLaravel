@@ -176,7 +176,7 @@ class UsersController extends Controller
       ];
 
 
-    return response()->json([
+    return response()->json(
       $userDetails,
       // $request->user()->city,
       // $request->user()->gender,
@@ -184,7 +184,7 @@ class UsersController extends Controller
       // $request->user()->prefCities,
       // $request->user()->prefGenders,
       // $request->user()->prefMaritalStatuses,
-    ]);
+    );
   }
 
 
