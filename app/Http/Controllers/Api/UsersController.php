@@ -113,7 +113,7 @@ class UsersController extends Controller
   public function allOtherUsers()
   {
 
-    $users = auth()->user()->getAllFriendships();
+    // $users = auth()->user()->getAllFriendships();
 
     //TODO: Make SELECT query using User's preferences
     $users = User::select([
@@ -136,6 +136,7 @@ class UsersController extends Controller
       ])
 
       ->where('id', '!=', auth()->id())
+      ->where('adminApproved', 1)
       ->where('adminBanned', 0)
 
       ->with('gender')
@@ -145,6 +146,9 @@ class UsersController extends Controller
       ->with('prefGenders')
       ->with('prefMaritalStatuses')
       ->paginate(15);
+
+    if(count($users) === 0)
+      return response()->json(['message' => 'No Other Users Approved Yet']);
 
     return response()->json($users);
   }
