@@ -116,6 +116,14 @@ class UsersController extends Controller
 
     //TODO: Make SELECT query using User's preferences
     $users = User::where('id', '!=', auth()->id())->where('adminApproved', 1)->where('adminBanned', 0)->get();
+    foreach($users as $user){
+      $user->gender;
+      $user->city;
+      $user->maritalStatus;
+      $user->prefCities;
+      $user->prefGenders;
+      $user->prefMaritalStatuses;
+    }
     // foreach($users as $user){
     //   if($user->isFriendWith(auth()->user())){
 
