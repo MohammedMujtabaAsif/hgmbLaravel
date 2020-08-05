@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Demency\Friendships\Traits\Friendable;
+use Illuminate\Pagination\Factory;
 use Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -132,44 +133,20 @@ class UsersController extends Controller
         'prefMinAge',
         'prefMaxAge',
         'prefMaxNumOfChildren',
-      ])->where('id', '!=', auth()->id())->where('adminBanned', 0)->get();
-
-      $cleanUsers = array();
+      ])
       
-      foreach($users as $user){
-        $newUser = [
-        // 'userDetails' => $userCleaned['id'],
-        'id' => $user['id'],
-        'firstNames' => $user['firstNames'],
-        'surname' => $user['surname'],
-        'prefName' => $user['prefName'],
-        'email' => $user['email'],
-        'phoneNumber' => $user['phoneNumber'],
-        'dob' => $user['dob'],
-        'age' => $user['age'],
-        'numOfChildren' => $user['numOfChildren'],
-        'bio' => $user['bio'],
-        'prefMinAge' => $user['prefMinAge'],
-        'prefMaxAge' => $user['prefMaxAge'],
-        'prefMaxNumOfChildren' => $user['prefMaxNumOfChildren'],
-        'gender' => $user->gender,
-        'city' => $user->city,
-        'maritalStatus' => $user->maritalStatus,
-        'prefCities' => $user->prefCities,
-        'prefGenders' => $user->prefGenders,
-        'prefMaritalStatuses' => $user->prefMaritalStatuses,
-        ];        
+      ->where('id', '!=', auth()->id())
+      ->where('adminBanned', 0)
 
-        array_push($cleanUsers, $newUser);
-    }
-    // foreach($users as $user){
-    //   if($user->isFriendWith(auth()->user())){
+      ->with('gender')
+      ->with('city')
+      ->with('maritalStatus')
+      ->with('prefCities')
+      ->with('prefGenders')
+      ->with('prefMaritalStatuses')
+      ->paginate(15);
 
-    //   }
-
-    // }
-
-    return response()->json($cleanUsers);
+    return response()->json($users);
   }
 
 
