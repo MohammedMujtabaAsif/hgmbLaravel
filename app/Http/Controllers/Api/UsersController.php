@@ -168,6 +168,7 @@ class UsersController extends Controller
       'prefMaxAge' => $userCleaned['prefMaxAge'],
       'prefMaxNumOfChildren' => $userCleaned['prefMaxNumOfChildren'],
       'gender' => $user->gender,
+      'city' => $user->city,
       'maritalStatus' => $user->maritalStatus,
       'prefCities' => $user->prefCities,
       'prefGenders' => $user->prefGenders,
@@ -176,7 +177,7 @@ class UsersController extends Controller
 
 
     return response()->json([
-      'user' => $userDetails,
+      $userDetails,
       // $request->user()->city,
       // $request->user()->gender,
       // $request->user()->maritalStatus,
