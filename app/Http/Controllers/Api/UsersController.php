@@ -234,7 +234,7 @@ class UsersController extends Controller
       ->with('prefMaritalStatuses')
       ->where('id', $request['id'])->first();
 
-      return response()->json([$user]);
+      return response()->json($user);
   }
 
 
@@ -260,7 +260,7 @@ class UsersController extends Controller
       $friend->prefGenders;
       $friend->prefMaritalStatuses;
     }
-      return response()->json([$friends]);
+      return response()->json($friends);
   }
 
 
@@ -347,7 +347,7 @@ class UsersController extends Controller
       $matchRequest->prefMaritalStatuses;
     }
 
-    return response()->json([$matchRequests]);
+    return response()->json($matchRequests);
   }
 
 
