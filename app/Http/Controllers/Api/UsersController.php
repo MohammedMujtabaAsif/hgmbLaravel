@@ -83,23 +83,27 @@ class UsersController extends Controller
   }
 
 
-  public function deleteAccount()
+  public function deleteAccount(Request $request)
   {
     $user = User::find(Auth::user()->id);
-    $user->logout();
+    $hasher = app('hash');
+    if ($hasher->check($request['password'], $user->password)) {
+      $request->user()->token()->revoke();
 
-    if ($user->delete()) {
-      return response()->json([
-        'success' => true,
-        'message' => 'Your account has been successfully deleted',
-        'code' => 200,
-      ]);
+      if ($user->delete()) {
+        return response()->json([
+          'success' => true,
+          'message' => 'Your account has been successfully deleted',
+          'code' => 200,
+        ]);
+      }
     }
 
     else {
       return response()->json([
         'success' => false,
         'message' =>'Failed to delete your account!',
+        'passsword' => $request['password']
       ]);
     }
   }
@@ -404,7 +408,8 @@ class UsersController extends Controller
     */
   public function unmatch(Request $request){
     $user = $request->user();
-    $friend = User::where('id', request('id'))->first();
+    $recipient = User::where('id', $request['id'])->first();
+
 
     if(($user->isFriendWith($friend))){
 
@@ -436,7 +441,8 @@ class UsersController extends Controller
     */
   public function blockUser(Request $request){
     $user = $request->user();
-    $userToBlock = User::where('id', request('id'))->first();
+    $recipient = User::where('id', $request['id'])->first();
+
 
     if($user->blockFriend($userToBlock)){
       return response()->json([        
@@ -460,7 +466,7 @@ class UsersController extends Controller
     */
   public function unblockUser(Request $request){
     $user = $requst->user();
-    $userToUnblock = User::where('id', request('id'))->first();
+    $recipient = User::where('id', $request['id'])->first();
 
     if($user->unblockFriend($userToUnblock)){
       return response()->json([        

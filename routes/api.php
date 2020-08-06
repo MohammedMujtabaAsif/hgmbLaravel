@@ -28,7 +28,7 @@ Route::get('email/verify/{id}/{hash}', 'Api\VerificationController@verify')->nam
 Route::group(['middleware' => ['auth:api']], function(){
     // Allow users who are authenticated to access these routes
     Route::get('logout', 'Api\LoginController@logout');
-    Route::get('deleteAccount', 'UsersController@deleteAccount');
+    Route::post('deleteAccount', 'Api\UsersController@deleteAccount');
     Route::get('user', 'Api\UsersController@getCurrentUser');
     
     // Resend Email Verification route
