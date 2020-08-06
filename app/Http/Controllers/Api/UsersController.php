@@ -360,13 +360,14 @@ class UsersController extends Controller
     */
   public function acceptMatchRequest(Request $request){
     $user = $request->user();
-    $sender = User::where('id', request('id'))->first();
+    $sender = User::where('id', $request['id'])->first();
+
 
     if($sender==null){
       return response()->json(['success' => false, 'message' => "User Not Found", 'response' => $request->all()]);
     }
-
-    if($user->acceptFriendRequest($sender)){
+    
+    elseif($user->acceptFriendRequest($sender)){
       return response()->json(['success' => true, 'message' => 'Accepted Match Request from ' . $sender->prefName], 200);
     }
     
@@ -382,9 +383,13 @@ class UsersController extends Controller
     */
   public function denyMatchRequest(Request $request){
     $user = $request->user();
-    $sender = User::where('id', request('id'))->first();
+    $sender = User::where('id', $request['id'])->first();
 
-    if($user->denyFriendRequest($sender)){
+    if($sender==null){
+      return response()->json(['success' => false, 'message' => "User Not Found", 'response' => $request->all()]);
+    }
+    
+    elseif($user->denyFriendRequest($sender)){
       return response()->json(['success' => true, 'message' => 'Denied Match Request from ' . $sender->prefName], 200);
     }
 
