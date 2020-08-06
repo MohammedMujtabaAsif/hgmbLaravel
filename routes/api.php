@@ -48,6 +48,7 @@ Route::group(['middleware' => ['auth:api']], function(){
             Route::post('unmatch', 'Api\UsersController@unmatch');
             Route::post('blockUser', 'Api\UsersController@blockUser');
             Route::post('unblockUser', 'Api\UsersController@unblockUser');
+            Route::post('userWithID', 'Api\UsersController@getUserWithID');
             
             // Route::apiResources(['appointments' => 'Api\AppointmentsController']);        
     });
