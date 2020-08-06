@@ -135,16 +135,16 @@ class UsersController extends Controller
         'prefMaxNumOfChildren',
       ])
 
-      ->where('id', '!=', auth()->id())
-      ->where('adminApproved', 1)
-      ->where('adminBanned', 0)
-
       ->with('gender')
       ->with('city')
       ->with('maritalStatus')
       ->with('prefCities')
       ->with('prefGenders')
       ->with('prefMaritalStatuses')
+
+      ->where('id', '!=', auth()->id())
+      ->where('adminApproved', 1)
+      ->where('adminBanned', 0)
       ->paginate(15);
 
     if(count($users) === 0)
@@ -203,15 +203,38 @@ class UsersController extends Controller
       ];
 
 
-    return response()->json(
-      $userDetails,
-      // $request->user()->city,
-      // $request->user()->gender,
-      // $request->user()->maritalStatus,
-      // $request->user()->prefCities,
-      // $request->user()->prefGenders,
-      // $request->user()->prefMaritalStatuses,
-    );
+    return response()->json($userDetails);
+  }
+
+
+  public function getUserWithID(Request $request){
+      $user = User::select([
+        'id',
+        'firstNames',
+        'surname',
+        'prefName',
+        'email',
+        'phoneNumber',
+        'gender_id',
+        'city_id',
+        'marital_status_id',
+        'dob',
+        'age',
+        'numOfChildren',
+        'bio',
+        'prefMinAge',
+        'prefMaxAge',
+        'prefMaxNumOfChildren',
+      ])
+      ->with('gender')
+      ->with('city')
+      ->with('maritalStatus')
+      ->with('prefCities')
+      ->with('prefGenders')
+      ->with('prefMaritalStatuses')
+      ->where('id', $request['id'])->first();
+
+      return response()->json([$user]);
   }
 
 
@@ -313,6 +336,8 @@ class UsersController extends Controller
       ]);
     }
 
+    print($matchRequests);
+
     foreach($matchRequests as $matchRequest){
       $matchRequest->gender;
       $matchRequest->city;
@@ -322,7 +347,7 @@ class UsersController extends Controller
       $matchRequest->prefMaritalStatuses;
     }
 
-    return response()->json($matchRequests);
+    return response()->json([$matchRequests]);
   }
 
 
