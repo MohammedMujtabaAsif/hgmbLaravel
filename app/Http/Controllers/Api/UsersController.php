@@ -110,7 +110,7 @@ class UsersController extends Controller
     *
     * @return Response
     */
-  public function allOtherUsers()
+  public function getAllOtherUsers()
   {
 
     // $users = auth()->user()->getAllFriendships();
@@ -159,7 +159,7 @@ class UsersController extends Controller
     *
     * @return Response
     */
-  public function currentUser(Request $request)
+  public function getCurrentUser(Request $request)
   {   
     
     $user = $request->user();
@@ -222,13 +222,21 @@ class UsersController extends Controller
     */
   public function getMatchedUsers(Request $request){
     $user = $request->user();
-    $friends = $user->getFriends(10, 'simple');
+    $friends = $user->getFriends(10);
     
     if(count($friends) === 0)
     // if no matches are found, return a message 
       return response()->json(['message' => 'No Matches']);
     else
     // if matches are found return them as JSON
+    foreach($friends as $friend){
+      $friend->gender;
+      $friend->city;
+      $friend->maritalStatus;
+      $friend->prefCities;
+      $friend->prefGenders;
+      $friend->prefMaritalStatuses;
+    }
       return response()->json([$friends]);
   }
 
@@ -268,11 +276,12 @@ class UsersController extends Controller
     }
 
     elseif($user->hasFriendRequestFrom($recipient)){
-      $user->befriend($recipient);
+      if($user->befriend($recipient)){
       return response()->json([        
         'success' => true,
         'message' => 'You Matched with ' . $recipient->prefName,
       ]);
+      }
     }
 
     elseif($user->befriend($recipient)==true){
@@ -302,6 +311,15 @@ class UsersController extends Controller
       return response()->json([
         'message' => 'No Matches Found',
       ]);
+    }
+
+    foreach($matchRequests as $matchRequest){
+      $matchRequest->gender;
+      $matchRequest->city;
+      $matchRequest->maritalStatus;
+      $matchRequest->prefCities;
+      $matchRequest->prefGenders;
+      $matchRequest->prefMaritalStatuses;
     }
 
     return response()->json($matchRequests);
