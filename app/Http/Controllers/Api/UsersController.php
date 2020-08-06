@@ -362,6 +362,10 @@ class UsersController extends Controller
     $user = $request->user();
     $sender = User::where('id', request('id'))->first();
 
+    if($sender==null){
+      return response()->json(['success' => false, 'message' => "User Not Found"]);
+    }
+
     if($user->acceptFriendRequest($sender)){
       return response()->json(['success' => true, 'message' => 'Accepted Match Request from ' . $sender->prefName], 200);
     }
