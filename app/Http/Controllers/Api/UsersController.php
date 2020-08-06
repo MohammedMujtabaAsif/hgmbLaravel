@@ -118,15 +118,15 @@ class UsersController extends Controller
     //TODO: Make SELECT query using User's preferences
     $users = User::select([
         'id',
-        'firstNames',
-        'surname',
+        // 'firstNames',
+        // 'surname',
         'prefName',
-        'email',
-        'phoneNumber',
+        // 'email',
+        // 'phoneNumber',
         'gender_id',
         'city_id',
         'marital_status_id',
-        'dob',
+        // 'dob',
         'age',
         'numOfChildren',
         'bio',
@@ -148,7 +148,7 @@ class UsersController extends Controller
       ->paginate(15);
 
     if(count($users) === 0)
-      return response()->json(['message' => 'No Other Users Approved Yet']);
+      return response()->json(['message' => 'No Other Users Have Been Approved Yet']);
 
     return response()->json($users);
   }
