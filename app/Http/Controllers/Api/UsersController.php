@@ -78,12 +78,17 @@ class UsersController extends Controller
   public function verificationCheck(){
     return response()->json([
       'success' => true,
-      'message' => 'authorised',
+      'message' => 'Authorised',
     ]);
   }
 
 
-  public function deleteAccount(Request $request)
+  public function update(Request $request){
+    $user = $request->user();
+
+  }
+
+  public function delete(Request $request)
   {
     $user = User::find(Auth::user()->id);
     $hasher = app('hash');
@@ -94,7 +99,6 @@ class UsersController extends Controller
         return response()->json([
           'success' => true,
           'message' => 'Your account has been successfully deleted',
-          'code' => 200,
         ]);
       }
       else {
@@ -163,7 +167,7 @@ class UsersController extends Controller
 
     return response()->json([
       'success' => true,
-      $users
+      'data' => $users,
       ]);
   }
 
@@ -225,7 +229,7 @@ class UsersController extends Controller
 
     return response()->json([
       'success' => true,
-      $userDetails
+      'data' => $userDetails
       ]);
   }
 
@@ -265,7 +269,7 @@ class UsersController extends Controller
 
       return response()->json([
         'success' => true,
-        $user
+        'data' => $user
         ]);
   }
 
@@ -297,12 +301,9 @@ class UsersController extends Controller
     }
       return response()->json([
         'success' => true,
-        $friends
+        'data' => $friends
         ]);
   }
-
-
-
 
   /**
     * Send match request to another user
@@ -389,8 +390,8 @@ class UsersController extends Controller
     }
 
     return response()->json([
-      'success' =>true,
-      $senders
+      'success' => true,
+      'data' => $senders
       ]);
   }
 
@@ -475,7 +476,7 @@ class UsersController extends Controller
       if($user->unfriend($friend)){
         return response()->json([        
           'success' => true,
-          'message' => 'Match Ended with ' . $friend->prefName
+          'message' => 'Unmatched with ' . $friend->prefName
         ]);
       }
 
@@ -487,7 +488,7 @@ class UsersController extends Controller
 
     return response()->json([
       'success' => false,
-      'message' => 'You must match with ' . $friend->prefName . ' before unmatching',
+      'message' => 'You Must Match with ' . $friend->prefName . ' Before Unmatching',
     ]);
     
   }
@@ -511,7 +512,7 @@ class UsersController extends Controller
     if($user->blockFriend($userToBlock)){
       return response()->json([        
         'success' => true,
-        'message' => 'User Blocked'
+        'message' => 'Blocked ' . $userToBlock->prefName,
       ]);
     }
 
@@ -535,13 +536,13 @@ class UsersController extends Controller
     if($user->unblockFriend($userToUnblock)){
       return response()->json([        
         'success' => true,
-        'message' => 'User Unblocked'
+        'message' => 'Unblocked ' . $userToUnblock->prefName,
       ]);
     }
     else {
       return response()->json([
         'success' => false,
-        'message' => 'Unable to Unblock'
+        'message' => 'Unable to Unblock' . $userToUnblock->prefName,
       ]);
     }
   }
