@@ -29,7 +29,7 @@ Route::group(['middleware' => ['auth:api']], function(){
     // Allow users who are authenticated to access these routes
     Route::get('logout', 'Api\LoginController@logout');
     Route::get('deleteAccount', 'UsersController@deleteAccount');
-    Route::get('user', 'Api\UsersController@currentUser');
+    Route::get('user', 'Api\UsersController@getCurrentUser');
     
     // Resend Email Verification route
     Route::get('email/resend', 'Api\VerificationController@resend')->middleware('auth:api')->name('verification.resend');
@@ -38,7 +38,7 @@ Route::group(['middleware' => ['auth:api']], function(){
             // Only allow user's who are admin approved and
             // have verified their email address to reach these routes
             Route::get('/verify', 'Api\UsersController@verificationCheck');
-            Route::get('allOtherUsers', 'Api\UsersController@allOtherUsers');
+            Route::get('allOtherUsers', 'Api\UsersController@getAllOtherUsers');
             // Route::get('getMatches', 'Api\UsersController@allMatches');
             Route::get('getMatchedUsers', 'Api\UsersController@getMatchedUsers');
             Route::post('sendMatchRequest', 'Api\UsersController@sendMatchRequest');
