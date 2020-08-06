@@ -335,19 +335,21 @@ class UsersController extends Controller
         'message' => 'No Matches Found',
       ]);
     }
-
-    print($matchRequests);
+    
+    $senders = array();
 
     foreach($matchRequests as $matchRequest){
-      $matchRequest->gender;
-      $matchRequest->city;
-      $matchRequest->maritalStatus;
-      $matchRequest->prefCities;
-      $matchRequest->prefGenders;
-      $matchRequest->prefMaritalStatuses;
+      $sender = $matchRequest->sender;
+      $sender->gender;
+      $sender->city;
+      $sender->maritalStatus;
+      $sender->prefCities;
+      $sender->prefGenders;
+      $sender->prefMaritalStatuses;
+      $senders[] = $sender;
     }
 
-    return response()->json($matchRequests);
+    return response()->json($senders);
   }
 
 
