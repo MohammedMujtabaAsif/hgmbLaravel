@@ -97,15 +97,20 @@ class UsersController extends Controller
           'code' => 200,
         ]);
       }
+      else {
+          return response()->json([
+            'success' => false,
+            'message' =>'Failed to delete your account!',
+          ]);
+      }
     }
-
-    else {
+    else{        
       return response()->json([
-        'success' => false,
-        'message' =>'Failed to delete your account!',
-        'passsword' => $request['password']
-      ]);
-    }
+          'success' => false,
+          'message' =>'Incorrect Password',
+          'passsword' => $request['password']
+        ]);
+      }
   }
 
 
@@ -152,9 +157,14 @@ class UsersController extends Controller
       ->paginate(15);
 
     if(count($users) === 0)
-      return response()->json(['message' => 'No Other Users Have Been Approved Yet']);
+      return response()->json([#
+        'success' => false,
+        'message' => 'No Other Users Have Been Approved Yet']);
 
-    return response()->json($users);
+    return response()->json([
+      'success' => true,
+      $users
+      ]);
   }
 
 
@@ -167,6 +177,13 @@ class UsersController extends Controller
   {   
     
     $user = $request->user();
+
+    if(is_null($user))
+      return response()->json([
+        'success' => false,
+        'message' => 'User Not Found',
+      ]);
+
     $userCleaned = $user->only([
         'id',
         'firstNames',
@@ -184,7 +201,6 @@ class UsersController extends Controller
       ]);
 
     $userDetails = [
-      // 'userDetails' => $userCleaned['id'],
       'id' => $userCleaned['id'],
       'firstNames' => $userCleaned['firstNames'],
       'surname' => $userCleaned['surname'],
@@ -205,9 +221,12 @@ class UsersController extends Controller
       'pref_genders' => $user->prefGenders,
       'pref_marital_statuses' => $user->prefMaritalStatuses,
       ];
+    
 
-
-    return response()->json($userDetails);
+    return response()->json([
+      'success' => true,
+      $userDetails
+      ]);
   }
 
 
@@ -238,7 +257,16 @@ class UsersController extends Controller
       ->with('prefMaritalStatuses')
       ->where('id', $request['id'])->first();
 
-      return response()->json($user);
+      if(is_null($user))
+        return response()->json([
+          'success' => false,
+          'message' => 'User Not Found'
+        ]);
+
+      return response()->json([
+        'success' => true,
+        $user
+        ]);
   }
 
 
@@ -251,9 +279,12 @@ class UsersController extends Controller
     $user = $request->user();
     $friends = $user->getFriends(10);
     
-    if(count($friends) === 0)
+    if(count($friends) == 0)
     // if no matches are found, return a message 
-      return response()->json(['message' => 'No Matches']);
+      return response()->json([
+        'success' -> false,
+        'message' => 'No Matches',
+        ]);
     else
     // if matches are found return them as JSON
     foreach($friends as $friend){
@@ -264,7 +295,10 @@ class UsersController extends Controller
       $friend->prefGenders;
       $friend->prefMaritalStatuses;
     }
-      return response()->json($friends);
+      return response()->json([
+        'success' => true,
+        $friends
+        ]);
   }
 
 
@@ -336,7 +370,8 @@ class UsersController extends Controller
 
     if(count($matchRequests) === 0){
       return response()->json([
-        'message' => 'No Matches Found',
+        'success' => false,
+        'message' => 'No Matches Requests Found',
       ]);
     }
     
@@ -353,7 +388,10 @@ class UsersController extends Controller
       $senders[] = $sender;
     }
 
-    return response()->json($senders);
+    return response()->json([
+      'success' =>true,
+      $senders
+      ]);
   }
 
 
@@ -367,15 +405,23 @@ class UsersController extends Controller
     $sender = User::where('id', $request['id'])->first();
 
 
-    if($sender==null){
-      return response()->json(['success' => false, 'message' => "User Not Found", 'response' => $request->all()]);
-    }
+    if(is_null($sender))
+      return response()->json([
+        'success' => false,
+        'message' => 'Could Not Find User'
+      ]);
     
     elseif($user->acceptFriendRequest($sender)){
-      return response()->json(['success' => true, 'message' => 'Accepted Match Request from ' . $sender->prefName], 200);
+      return response()->json([
+        'success' => true,
+        'message' => 'Accepted Match Request from ' . $sender->prefName,
+        ]);
     }
     
-    return response()->json(['success' => false, 'message' => 'Failed to Accept Match Request from ' . $sender->prefName]);
+    return response()->json([
+      'success' => false,
+      'message' => 'Failed to Accept Match Request from ' . $sender->prefName,
+      ]);
 
   }
 
@@ -389,15 +435,23 @@ class UsersController extends Controller
     $user = $request->user();
     $sender = User::where('id', $request['id'])->first();
 
-    if($sender==null){
-      return response()->json(['success' => false, 'message' => "User Not Found", 'response' => $request->all()]);
-    }
+    if(is_null($sender))
+      return response()->json([
+        'success' => false,
+        'message' => 'Could Not Find User'
+      ]);
     
     elseif($user->denyFriendRequest($sender)){
-      return response()->json(['success' => true, 'message' => 'Denied Match Request from ' . $sender->prefName], 200);
+      return response()->json([
+        'success' => true,
+        'message' => 'Denied Match Request from ' . $sender->prefName,
+        ]);
     }
 
-    return response()->json(['success' => false, 'message' => 'Failed to Deny Match Request from ' . $sender->prefName]);
+    return response()->json([
+      'success' => false,
+      'message' => 'Failed to Deny Match Request from ' . $sender->prefName,
+      ]);
   }
 
 
@@ -408,27 +462,32 @@ class UsersController extends Controller
     */
   public function unmatch(Request $request){
     $user = $request->user();
-    $recipient = User::where('id', $request['id'])->first();
+    $friend = User::where('id', $request['id'])->first();
 
+    if(is_null($friend))
+      return response()->json([
+        'success' => false,
+        'message' => 'Could Not Find User'
+      ]);
 
     if(($user->isFriendWith($friend))){
 
       if($user->unfriend($friend)){
         return response()->json([        
           'success' => true,
-          'message' => 'Match Ended'
+          'message' => 'Match Ended with ' . $friend->prefName
         ]);
       }
 
       return response()->json([        
         'success' => false,
-        'message' => 'Failed to Unmatch'
+        'message' => 'Failed to Unmatch with ' . $friend->prefName
       ]);
     }
 
     return response()->json([
       'success' => false,
-      'message' => 'You must match with ' . $friend->prefName . ' before unmatching'
+      'message' => 'You must match with ' . $friend->prefName . ' before unmatching',
     ]);
     
   }
@@ -441,8 +500,13 @@ class UsersController extends Controller
     */
   public function blockUser(Request $request){
     $user = $request->user();
-    $recipient = User::where('id', $request['id'])->first();
+    $userToBlock = User::where('id', $request['id'])->first();
 
+    if(is_null($userToBlock))
+      return response()->json([
+        'success' => false,
+        'message' => 'Could Not Find User'
+      ]);
 
     if($user->blockFriend($userToBlock)){
       return response()->json([        
@@ -466,7 +530,7 @@ class UsersController extends Controller
     */
   public function unblockUser(Request $request){
     $user = $requst->user();
-    $recipient = User::where('id', $request['id'])->first();
+    $userToUnblock = User::where('id', $request['id'])->first();
 
     if($user->unblockFriend($userToUnblock)){
       return response()->json([        
