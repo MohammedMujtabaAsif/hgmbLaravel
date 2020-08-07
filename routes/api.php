@@ -71,7 +71,7 @@ Route::group(['middleware' => ['auth:api']], function(){
 
                 Route::get('blockedMatches', 'Api\MatchesController@getBlockedMatches');
 
-                Route::get('sentRequests', 'Api\MatchesController@getsentRequests');
+                Route::get('sentRequests', 'Api\MatchesController@getSentRequests');
             });
 
 
