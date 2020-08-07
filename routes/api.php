@@ -70,6 +70,8 @@ Route::group(['middleware' => ['auth:api']], function(){
                 Route::get('acceptedMatches', 'Api\MatchesController@getAcceptedMatches');
 
                 Route::get('blockedMatches', 'Api\MatchesController@getBlockedMatches');
+
+                Route::get('sentRequests', 'Api\MatchesController@getsentRequests');
             });
 
 
