@@ -15,29 +15,50 @@ use Route;
 */
 
 // Allow any user to reach these routes
+
 Route::post('post/register', 'Api\RegisterController@register')->name('user.register');
 Route::post('post/login', 'Api\LoginController@login')->name('user.login');
+
 
 // Password reset routes
 Route::post('post/password/sendResetEmail', 'Auth\ForgotPasswordController@sendResetLinkEmail');
 // Route::post('password/resetPassword', 'Api\ResetPasswordController@reset');
 
+
 // Email Verification route
 Route::get('email/verify/{id}/{hash}', 'Api\VerificationController@verify')->name('verification.verify');
 
+
 Route::group(['middleware' => ['auth:api']], function(){
-    // Allow users who are authenticated to access these routes
-    Route::get('get/logout', 'Api\LoginController@logout');
-    Route::get('get/user', 'Api\UsersController@index');
-    Route::post('post/deleteAccount', 'Api\UsersController@delete');
-    Route::post('post/updateAccount', 'Api\UsersController@update');
+
+    // Allow users who:
+    // HAVE authenticated themselves
+
+    //prefix GET routes with '/get'
+    Route::group(['prefix' => 'get'], function () {
+        Route::get('logout', 'Api\LoginController@logout');
+        Route::get('user', 'Api\UsersController@index');
+    });
+
+
+    //prefix POST routes with '/post'
+    Route::group(['prefix' => 'post'], function () {
+        Route::post('post/deleteAccount', 'Api\UsersController@delete');
+        Route::post('post/updateAccount', 'Api\UsersController@update');
+    });
+
     
     // Resend Email Verification route
     Route::get('email/resend', 'Api\VerificationController@resend')->middleware('auth:api')->name('verification.resend');
 
         Route::group(['middleware' => ['CustomEmailVerified', 'approved']], function () {
-            // Only allow user's who are admin approved and
-            // have verified their email address to reach these routes
+            // Allow users who:
+            // HAVE verified their email address,
+            // HAVE been approved by admin 
+            // NOT banned to reach these routes
+
+
+            //prefix GET routes with '/get'
             Route::group(['prefix' => 'get'], function () {
                 Route::get('verify', 'Api\UsersController@verificationCheck');
 
@@ -51,6 +72,8 @@ Route::group(['middleware' => ['auth:api']], function(){
                 Route::get('blockedMatches', 'Api\MatchesController@getBlockedMatches');
             });
 
+
+            //prefix POST routes with '/post'
             Route::group(['prefix' => 'post'], function () {
                 Route::post('userWithID', 'Api\UsersController@getUserWithID');
 
@@ -65,11 +88,4 @@ Route::group(['middleware' => ['auth:api']], function(){
             // Route::apiResources(['appointments' => 'Api\AppointmentsController']);        
     });
 });
-
-
-//GET AUTHENTICATED USER (skip verified middleware)
-// 
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 
