@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\User;
+use DatabaseRule;
 
 class UsersController extends Controller
 {
@@ -22,31 +23,21 @@ class UsersController extends Controller
     */
   public function index()
   {    
-    $user = User::select([
-        'id',
-        'firstNames',
-        'surname',
-        'prefName',
-        'email',
-        'phoneNumber',
-        'gender_id',
-        'city_id',
-        'marital_status_id',
-        'dob',
-        'age',
-        'numOfChildren',
-        'bio',
-        'prefMinAge',
-        'prefMaxAge',
-        'prefMaxNumOfChildren',
-      ])
+    $user = User::where('id', auth()->user()->id)
       ->with('gender')
       ->with('city')
       ->with('maritalStatus')
       ->with('prefCities')
       ->with('prefGenders')
       ->with('prefMaritalStatuses')
-      ->where('id', request()->user()->id)->first();
+      ->first()
+      ->makeVisible([
+        'firstNames',
+        'surname',
+        'email',
+        'phoneNumber',
+        'dob',
+      ]);
 
     if(is_null($user))
       return response()->json([
@@ -76,59 +67,62 @@ class UsersController extends Controller
       'firstNames' => 'required|string',
       'surname' => 'required|string',
       'prefName'=>'required|string',
-      'email' => 'required|string|email|unique:users',
-      'phoneNumber' => 'required|unique:users|max:11|regex:/(0)[0-9]{10}/|string',
+      'email' => 'required|unique:users,email,' . $request->user()->id,
+      'password' => 'required|string|confirmed',
+      'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users,phoneNumber,' . $request->user()->id,
       'city_id' => 'required|integer',
       'gender_id'=>'required|integer',
       'marital_status_id'=>'required|integer',
       'dob'=>'required|date|before:18 years ago',
-      'numOfChildren'=>'require|integer',
+      'numOfChildren'=>'integer',
       'bio'=>'required|string|max:1000',
-      // 'image' => 'file|max:5000',
+      'image' => 'file|max:5000',
 
       //Validate user's partner preferences
-      'prefMinAge'=>'required|integer|min:18|lt:prefMaxAge',
-      'prefMaxAge'=>'required|integer|min:20|gt:prefMinAge',
-      'prefMaxNumOfChildren'=>'required|integer',
-
-      'prefCities' => 'required|integer|array|distinct',
-      'prefGenders'=>'required|integer|array|distinct',
-      'prefMaritalStatuses'=>'required|integer|array|distinct',
-      
-      ]);
+      'pref_cities' => 'required|array|distinct',
+      'pref_cities.*' => 'integer',
+      'pref_genders'=>'required|array|distinct',
+      'pref_genders.*'=>'integer',
+      'pref_marital_statuses'=>'required|array|distinct',
+      'pref_marital_statuses.*'=>'integer',
+      'pref_min_age'=>'required|integer|min:18',
+      'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
+      'pref_num_of_children'=>'required|integer',
+    ]);
 
       if($validator->fails()){
         return response()->json([
           'success' => false,
-          'message' => $validator->errors
+          'message' => $validator->errors(),
+          'email' => auth()->user()->email
         ]);
       }
 
       $user->update([
         // //User's personal details
-        'firstNames' => $validator['firstNames'],
-        'surname' => $validator['surname'],
-        'prefName'=> $validator['prefName'],
-        'email' => $validator['email'],
-        'password' => bcrypt($validator['password']),
-        'phoneNumber' => $validator['phoneNumber'],
-        'city_id' => (int) $validator['city_id'],
-        'gender_id' => (int) $validator['gender_id'],
-        'marital_status_id' => (int) $validator['marital_status_id'], 
-        'dob' => Carbon::createFromFormat('Y-m-d', input['dob']),
-        'age' => Carbon::parse($validator['dob'])->diff(Carbon::now())->format('%y'),
+        'firstNames' => $request['firstNames'],
+        'surname' => $request['surname'],
+        'prefName'=> $request['prefName'],
+        'email' => $request['email'],
+        'password' => bcrypt($request['password']),
+        'phoneNumber' => $request['phoneNumber'],
+        'city_id' => (int) $request['city_id'],
+        'gender_id' => (int) $request['gender_id'],
+        'marital_status_id' => (int) $request['marital_status_id'], 
+        'dob' => Carbon::createFromFormat('Y-m-d', request['dob']),
+        'age' => Carbon::parse($request['dob'])->diff(Carbon::now())->format('%y'),
         'numOfChildren' => $validator['numOfChildren'],
-        'bio' => $validator['bio'],
+        'bio' => $request['bio'],
         // TODO: imageAddress
 
         //User's partner preferences
-        'prefMinAge' => (int) $validator['prefMinAge'],
-        'prefMaxAge' => (int) $validator['prefMaxAge'],
-        'prefMaxNumOfChildren' => (int) $validator['prefMaxNumOfChildren'],
+        'prefMinAge' => (int) $request['prefMinAge'],
+        'prefMaxAge' => (int) $request['prefMaxAge'],
+        'prefMaxNumOfChildren' => (int) $request['prefMaxNumOfChildren'],
       ]);
 
 
-    if((int) $validator['gender_id'] == 0){ 
+    if((int) $request['gender_id'] == 0){ 
       $prefGenders = 1;
     }
     else{
@@ -136,8 +130,8 @@ class UsersController extends Controller
     }
     $user->prefGenders()->sync($prefGenders);
     
-    $user->prefCities()->sync((int) $validator['prefCities']);
-    $user->prefMaritalStatuses()->sync((int) $validator['prefMaritalStatuses']);
+    $user->prefCities()->sync((int) $request['prefCities']);
+    $user->prefMaritalStatuses()->sync((int) $request['prefMaritalStatuses']);
 
     return response()->json([
       'success' => true,
@@ -182,6 +176,7 @@ class UsersController extends Controller
     }
   }
 
+
   /**
     * If the user can access the verified and approved middleware
     * Return a positive response
@@ -207,36 +202,17 @@ class UsersController extends Controller
     // $users = auth()->user()->getAllFriendships();
     //TODO: Make SELECT query using User's preferences
 
-    $users = User::select([
-        'id',
-        // 'firstNames',
-        // 'surname',
-        'prefName',
-        // 'email',
-        // 'phoneNumber',
-        'gender_id',
-        'city_id',
-        'marital_status_id',
-        // 'dob',
-        'age',
-        'numOfChildren',
-        'bio',
-        'prefMinAge',
-        'prefMaxAge',
-        'prefMaxNumOfChildren',
-      ])
-
-      ->with('gender')
+    $users = User::
+        with('gender')
       ->with('city')
       ->with('maritalStatus')
       ->with('prefCities')
       ->with('prefGenders')
       ->with('prefMaritalStatuses')
-
-      ->where('id', '!=', auth()->id())
+      ->where('id', '!=', auth()->user()->id())
       ->where('adminApproved', 1)
       ->where('adminBanned', 0)
-      ->paginate(15);
+      ->paginate(10);
 
     if(count($users) === 0)
       return response()->json([
@@ -258,25 +234,8 @@ class UsersController extends Controller
     * @return Response
     */
   public function getUserWithID(Request $request){
-      $user = User::select([
-        'id',
-        // 'firstNames',
-        // 'surname',
-        'prefName',
-        // 'email',
-        // 'phoneNumber',
-        'gender_id',
-        'city_id',
-        'marital_status_id',
-        // 'dob',
-        'age',
-        'numOfChildren',
-        'bio',
-        'prefMinAge',
-        'prefMaxAge',
-        'prefMaxNumOfChildren',
-      ])
-      ->with('gender')
+      $user = User::
+        with('gender')
       ->with('city')
       ->with('maritalStatus')
       ->with('prefCities')
@@ -311,7 +270,7 @@ class UsersController extends Controller
         'success' -> false,
         'message' => 'No Matches',
       ]);
-    else
+
     // if matches are found return them as JSON
     foreach($friends as $friend){
       $friend->gender;
@@ -321,11 +280,13 @@ class UsersController extends Controller
       $friend->prefGenders;
       $friend->prefMaritalStatuses;
     }
-      return response()->json([
-        'success' => true,
-        'data' => $friends
-      ]);
+
+    return response()->json([
+      'success' => true,
+      'data' => $friends
+    ]);
   }
+
 
   /**
     * Send match request to another user
@@ -392,12 +353,12 @@ class UsersController extends Controller
     * @return Response
     */
   public function getPendingMatches(){
-    $pendingMatches = request()->user()->getFriendRequests($perPage = 10);
+    $pendingMatches = request()->user()->getFriendRequests(10);
 
     if(count($pendingMatches) === 0){
       return response()->json([
         'success' => false,
-        'message' => 'No Matches Requests Found',
+        'message' => 'No Match Requests Found',
       ]);
     }
     
@@ -422,7 +383,7 @@ class UsersController extends Controller
 
 
   public function getDeniedMatches(){
-    $deniedMatches = request()->user()->getDeniedFriendships();
+    $deniedMatches = request()->user()->getDeniedFriendships(10);
     
     if(count($deniedMatches) == 0)
       return response()->json([
@@ -430,7 +391,7 @@ class UsersController extends Controller
         'message' => "No Denied Matches Found"
       ]);
 
-        $senders = array();
+    $senders = array();
 
     foreach($deniedMatches as $matchRequest){
       $sender = $matchRequest->sender;
@@ -447,22 +408,16 @@ class UsersController extends Controller
       'success' => true,
       'data' => $senders
     ]);
-
-
-    return response()->json([
-      'success' => true,
-      'data' => $deniedMatches
-    ]);
   }
 
 
   public function getBlockedMatches(){
-    $blockedUsers = request()->user()->getBlockedFriendships();
+    $blockedUsers = request()->user()->getBlockedFriendships(10);
 
     if(count($blockedUsers) == 0)
       return response()->json([
         'success' => false,
-        'message' => "No Denied Matches Found"
+        'message' => "No Blocked Users Found"
       ]);
 
     return response()->json([
@@ -483,24 +438,31 @@ class UsersController extends Controller
     $user = $request->user();
     $sender = User::where('id', $request['id'])->first();
 
-
     if(is_null($sender))
       return response()->json([
         'success' => false,
         'message' => 'Could Not Find User'
       ]);
     
-    elseif($user->acceptFriendRequest($sender)){
+    if($user->hasFriendRequestFrom($sender)){
+
+      if($user->acceptFriendRequest($sender)){
+        return response()->json([
+          'success' => true,
+          'message' => 'Accepted Match Request from ' . $sender->prefName,
+        ]);
+      }
+      
       return response()->json([
-        'success' => true,
-        'message' => 'Accepted Match Request from ' . $sender->prefName,
+        'success' => false,
+        'message' => 'Failed to Accept Match Request from ' . $sender->prefName,
       ]);
     }
-    
+
     return response()->json([
       'success' => false,
-      'message' => 'Failed to Accept Match Request from ' . $sender->prefName,
-    ]);
+      'message' => 'There is No Match Request From ' . $sender->prefName,
+    ]);    
 
   }
 
@@ -522,17 +484,25 @@ class UsersController extends Controller
         'message' => 'Could Not Find User'
       ]);
     
-    elseif($user->denyFriendRequest($sender)){
+    if($user->hasFriendRequestFrom($sender)){
+      if($user->denyFriendRequest($sender)){
+        return response()->json([
+          'success' => true,
+          'message' => 'Denied Match Request from ' . $sender->prefName,
+        ]);
+      }
+
       return response()->json([
-        'success' => true,
-        'message' => 'Denied Match Request from ' . $sender->prefName,
+        'success' => false,
+        'message' => 'Failed to Deny Match Request from ' . $sender->prefName,
       ]);
     }
 
     return response()->json([
       'success' => false,
-      'message' => 'Failed to Deny Match Request from ' . $sender->prefName,
+      'message' => 'There is No Match Request From ' . $sender->prefName,
     ]);
+    
   }
 
 
@@ -592,18 +562,26 @@ class UsersController extends Controller
         'success' => false,
         'message' => 'Could Not Find User'
       ]);
+    
+    if($user->hasBlocked($userToBlock) == false){
 
-    if($user->blockFriend($userToBlock)){
-      return response()->json([        
-        'success' => true,
-        'message' => 'Blocked ' . $userToBlock->prefName,
+      if($user->blockFriend($userToBlock)){
+        return response()->json([        
+          'success' => true,
+          'message' => 'Blocked ' . $userToBlock->prefName,
+        ]);
+      }
+
+      return response()->json([
+        'success' => false,
+        'message' => 'Unable to Block'
       ]);
     }
-
+    
     return response()->json([
       'success' => false,
-      'message' => 'Unable to Block'
-    ]);
+      'message' => $userToBlock->prefName . ' is Already Blocked',
+    ]);    
     
   }
 
@@ -616,21 +594,35 @@ class UsersController extends Controller
     * @return Response
     */
   public function unblockMatch(Request $request){
-    $user = $requst->user();
+    $user = $request->user();
     $userToUnblock = User::where('id', $request['id'])->first();
 
-    if($user->unblockFriend($userToUnblock)){
-      return response()->json([        
-        'success' => true,
-        'message' => 'Unblocked ' . $userToUnblock->prefName,
-      ]);
-    }
-    else {
+    if(is_null($userToUnblock))
       return response()->json([
         'success' => false,
-        'message' => 'Unable to Unblock' . $userToUnblock->prefName,
+        'message' => 'Could Not Find User'
       ]);
+
+    if($user->hasBlocked($userToUnblock)){
+
+      if($user->unblockFriend($userToUnblock)){
+        return response()->json([        
+          'success' => true,
+          'message' => 'Unblocked ' . $userToUnblock->prefName,
+        ]);
+      }
+      else {
+        return response()->json([
+          'success' => false,
+          'message' => 'Unable to Unblock ' . $userToUnblock->prefName,
+        ]);
+      }
     }
+
+    return response()->json([
+      'success' => false,
+      'message' => $userToUnblock->prefName . ' is Not Blocked',
+    ]);    
   }
 
 
