@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
-use App\User;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use App\User;
 
 class RegisterController extends Controller
 {
@@ -18,58 +19,12 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param  Request  $request
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    protected function validator(Array $request)
     {
-        return Validator::make($data, [
-            //Validate user's personal details
-            'firstNames' => 'required|string',
-            'surname' => 'required|string',
-            'prefName'=>'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed',
-            'phoneNumber' => 'required|unique:users|max:11|regex:/(0)[0-9]{10}/|string',
-            'city_id' => 'required|integer',
-            'gender_id'=>'required|integer',
-            'marital_status_id'=>'required|integer',
-            'dob'=>'required|date|before:18 years ago',
-            'numOfChildren'=>'integer',
-            'bio'=>'required|string|max:1000',
-
-            //Validate user's partner preferences
-            'prefCities' => 'required|integer|array|distinct',
-            'prefGenders'=>'required|integer|array|distinct',
-            'prefMaritalStatuses'=>'required|integer|array|distinct',
-            'prefMinAge'=>'required|integer|min:18|lt:prefMaxAge',
-            'prefMaxAge'=>'required|integer|min:20|gt:prefMinAge',
-            'prefMaxNumOfChildren'=>'required|integer',
-        ]);
-    }
-
-
-/**
-     * Create user
-     *
-     * @param  [string] name
-     * @param  [string] email
-     * @param  [string] password
-     * @param  [string] password_confirmation
-     * @return [string] message
-     */
-    public function register(Request $request)
-        {
-
-            $prefGender;
-
-            if($data['gender_id']==1){
-                $prefGender = 2;
-            }else{
-                $prefGender = 1;
-            }
-
-            $validator = Validator::make($request->all(), [
+        return Validator::make($request, [
             //Validate user's personal details
             'firstNames' => 'required|string',
             'surname' => 'required|string',
@@ -86,60 +41,71 @@ class RegisterController extends Controller
             'image' => 'file|max:5000',
 
             //Validate user's partner preferences
-            'prefCities' => 'required|integer|array|distinct',
-            'prefGenders'=>'required|integer|array|distinct',
-            'prefMaritalStatuses'=>'required|integer|array|distinct',
-            'prefMinAge'=>'required|integer|min:18|lt:prefMaxAge',
-            'prefMaxAge'=>'required|integer|min:20|gt:prefMinAge',
-            'prefMaxNumOfChildren'=>'required|integer',
-            ]);
+            'pref_cities' => 'required|array|distinct',
+            'pref_cities.*' => 'integer|min:1|max:3',
+            'pref_genders'=>'required|array|distinct',
+            'pref_genders.*'=>'integer|min:1|max:2',
+            'pref_marital_statuses'=>'required|array|distinct',
+            'pref_marital_statuses.*'=>'integer|max:1|min:3',
+            'pref_min_age'=>'required|integer|min:18',
+            'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
+            'pref_num_of_children'=>'required|integer',
+        ]);
+    }
+
+
+    /**
+     * Create user
+     *
+     * @param  Request $request User details
+     *
+     * @return Response success User
+     */
+    public function register(Request $request)
+        {
+
+            $prefGender =1;
+
+            if($request['gender_id']==1){
+                $prefGender = 2;
+            }            
+
+            $validator = $this->validator($request->all());
 
             if ($validator->fails()) {
                 return response()->json([
                 'success' => false,
                 'message' => $validator->errors(),
-                'code' => 400,
                 ]);
             }
 
             $user =  User::create([
                 // //User's personal details
-                'firstNames' => $validator['firstNames'],
-                'surname' => $validator['surname'],
-                'prefName'=> $validator['prefName'],
-                'email' => $validator['email'],
-                'password' => bcrypt($validator['password']),
-                'phoneNumber' => $validator['phoneNumber'],
-                'city_id' => (int) $validator['city_id'],
-                'gender_id' => (int) $validator['gender_id'],
-                'marital_status_id' => (int) $validator['marital_status_id'], 
-                'dob' => Carbon::createFromFormat('Y-m-d', input['dob']),
-                'age' => Carbon::parse($validator['dob'])->diff(Carbon::now())->format('%y'),
-                'numOfChildren' => $validator['numOfChildren'],
-                'bio' => $validator['bio'],
+                'firstNames' => $request['firstNames'],
+                'surname' => $request['surname'],
+                'prefName'=> $request['prefName'],
+                'email' => $request['email'],
+                'password' => bcrypt($request['password']),
+                'phoneNumber' => $request['phoneNumber'],
+                'city_id' => (int) $request['city_id'],
+                'gender_id' => (int) $request['gender_id'],
+                'marital_status_id' => (int) $request['marital_status_id'], 
+                'dob' => Carbon::createFromFormat('Y-m-d', $request['dob']),
+                'age' => Carbon::parse($request['dob'])->diff(Carbon::now())->format('%y'),
+                'numOfChildren' => $request['numOfChildren'],
+                'bio' => $request['bio'],
                 // TODO: imageAddress
 
 
                 //User's partner preferences
-                'prefMinAge' => (int) $validator['prefMinAge'],
-                'prefMaxAge' => (int) $validator['prefMaxAge'],
-                'prefMaxNumOfChildren' => (int) $validator['prefMaxNumOfChildren'],
+                'prefMinAge' => (int) $request['pref_min_age'],
+                'prefMaxAge' => (int) $request['pref_max_age'],
+                'prefMaxNumOfChildren' => (int) $request['pref_num_of_children'],
             ]);
 
-            $user->prefCities()->sync((int) $validator['prefCities']);
+            $user->prefCities()->sync((int) $request['pref_cities']);
             $user->prefGenders()->sync((int) $prefGender);
-            $user->prefMaritalStatuses()->sync((int) $validator['prefMaritalStatuses']);
-
-        //     $input = $request->all();
-        //     $input['password'] = Hash::make($input['password']);
-        //     $input['dob'] = Carbon::createFromFormat('Y-m-d', input['dob']);
-        //     $input['age'] = Carbon::parse($input['dob'])->diff(Carbon::now())->format('%y');
-        //     $user = User::create($input);
-
-
-        // $user->prefCities()->sync((int) $data['prefCities']);
-        // $user->prefGenders()->sync((int) $prefGender);
-        // $user->prefMaritalStatuses()->sync((int) $data['prefMaritalStatuses']);
+            $user->prefMaritalStatuses()->sync((int) $request['pref_marital_statuses']);
 
             $token['token'] = $user->createToken('appToken')->accessToken;
 
@@ -147,7 +113,6 @@ class RegisterController extends Controller
                 'success' => true,
                 'token' => $token,
                 'user' => $user,
-                'code' => 201,
-            ]);
+            ], 201);
         }
 }

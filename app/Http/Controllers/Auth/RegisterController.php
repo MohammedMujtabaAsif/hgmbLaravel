@@ -67,12 +67,15 @@ class RegisterController extends Controller
             'image' => 'file|max:5000',
 
             //Validate user's partner preferences
-            'prefCities' => 'required|integer|array|distinct',
-            'prefGenders'=>'required|integer|array|distinct',
-            'prefMaritalStatuses'=>'required|integer|array|distinct',
-            'prefMinAge'=>'required|integer|min:18|lt:prefMaxAge',
-            'prefMaxAge'=>'required|integer|min:20|gt:prefMinAge',
-            'prefMaxNumOfChildren'=>'required|integer',
+            'pref_cities' => 'required|array|distinct',
+            'pref_cities.*' => 'integer|min:1|max:3',
+            'pref_genders'=>'required|array|distinct',
+            'pref_genders.*'=>'integer|min:1|max:2',
+            'pref_marital_statuses'=>'required|array|distinct',
+            'pref_marital_statuses.*'=>'integer|max:1|min:3',
+            'pref_min_age'=>'required|integer|min:18',
+            'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
+            'pref_num_of_children'=>'required|integer',
         ]);
     }
 
@@ -84,12 +87,10 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $prefGender;
-        if($data['gender_id']==1){
+        $prefGender = 1;
+        
+        if($data['gender_id']==1)
             $prefGender = 2;
-        }else{
-            $prefGender = 1;
-        }
 
         $user =  User::create([
             // //User's personal details
