@@ -35,31 +35,31 @@ Route::group(['middleware' => ['auth:api']], function(){
     // Resend Email Verification route
     Route::get('email/resend', 'Api\VerificationController@resend')->middleware('auth:api')->name('verification.resend');
 
-        Route::group(['middleware' => ['verified', 'approved']], function () {
+        Route::group(['middleware' => ['CustomEmailVerified', 'approved']], function () {
             // Only allow user's who are admin approved and
             // have verified their email address to reach these routes
             Route::group(['prefix' => 'get'], function () {
                 Route::get('verify', 'Api\UsersController@verificationCheck');
 
                 Route::get('allOtherUsers', 'Api\UsersController@getAllOtherUsers');
-                // Route::get('matchRequests','Api\UsersController@getMatchRequests');
-                Route::get('pendingMatches', 'Api\UsersController@getPendingMatches');
-                Route::get('deniedMatches', 'Api\UsersController@getDeniedMatches');
 
-                Route::get('acceptedMatches', 'Api\UsersController@getAcceptedMatches');
+                Route::get('pendingMatches', 'Api\MatchesController@getPendingMatches');
+                Route::get('deniedMatches', 'Api\MatchesController@getDeniedMatches');
 
-                Route::get('blockedMatches', 'Api\UsersController@getBlockedMatches');
+                Route::get('acceptedMatches', 'Api\MatchesController@getAcceptedMatches');
+
+                Route::get('blockedMatches', 'Api\MatchesController@getBlockedMatches');
             });
 
             Route::group(['prefix' => 'post'], function () {
                 Route::post('userWithID', 'Api\UsersController@getUserWithID');
 
-                Route::post('sendMatchRequest', 'Api\UsersController@sendMatchRequest');
-                Route::post('acceptMatchRequest', 'Api\UsersController@acceptMatchRequest');
-                Route::post('denyMatchRequest', 'Api\UsersController@denyMatchRequest');
-                Route::post('unmatch', 'Api\UsersController@unmatch');
-                Route::post('blockMatch', 'Api\UsersController@blockMatch');
-                Route::post('unblockMatch', 'Api\UsersController@unblockMatch');
+                Route::post('sendMatchRequest', 'Api\MatchesController@sendMatchRequest');
+                Route::post('acceptMatchRequest', 'Api\MatchesController@acceptMatchRequest');
+                Route::post('denyMatchRequest', 'Api\MatchesController@denyMatchRequest');
+                Route::post('unmatch', 'Api\MatchesController@unmatch');
+                Route::post('blockMatch', 'Api\MatchesController@blockMatch');
+                Route::post('unblockMatch', 'Api\MatchesController@unblockMatch');
             });
             
             // Route::apiResources(['appointments' => 'Api\AppointmentsController']);        
