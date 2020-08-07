@@ -32,6 +32,7 @@ return array(
     'App\\Http\\Middleware\\ApprovedCheck' => $baseDir . '/app/Http/Middleware/ApprovedCheck.php',
     'App\\Http\\Middleware\\Authenticate' => $baseDir . '/app/Http/Middleware/Authenticate.php',
     'App\\Http\\Middleware\\CheckForMaintenanceMode' => $baseDir . '/app/Http/Middleware/CheckForMaintenanceMode.php',
+    'App\\Http\\Middleware\\CustomEmailVerified' => $baseDir . '/app/Http/Middleware/CustomEmailVerified.php',
     'App\\Http\\Middleware\\EncryptCookies' => $baseDir . '/app/Http/Middleware/EncryptCookies.php',
     'App\\Http\\Middleware\\RedirectIfAuthenticated' => $baseDir . '/app/Http/Middleware/RedirectIfAuthenticated.php',
     'App\\Http\\Middleware\\TrimStrings' => $baseDir . '/app/Http/Middleware/TrimStrings.php',
