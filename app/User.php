@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Demency\Friendships\Traits\Friendable;
 use App\Notifications\ResetPassword as ResetPasswordNotification;
+use App\Notifications\CustomVerifyEmail as VerifyEmailNotification;
 use \Carbon\Carbon;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -59,6 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmailNotification());
     }
 
     public function city()
