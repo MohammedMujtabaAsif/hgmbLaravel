@@ -37,16 +37,10 @@ class CreateUsersTable extends Migration
             $table->text('bio');
             $table->string('imageAddress')->nullable();
 
-            // $table->integer('prefCities'); //FK
-            // $table->integer('prefGenders'); //FK
-            // $table->integer('prefMaritalStatuses'); // FK
-
             $table->integer('prefMinAge');
             $table->integer('prefMaxAge');
             $table->integer('prefMaxNumOfChildren');
 
-
-            
             $table->boolean('adminApproved')->default(0);
             $table->text('adminUnapprovedMessage')->nullable();
             $table->boolean('adminBanned')->default(0);
