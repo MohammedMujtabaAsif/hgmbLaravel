@@ -47,7 +47,6 @@ class UsersTableSeeder extends Seeder
                 'gender_id' => $gender,
                 'marital_status_id' => $faker->numberBetween($min = 1, $max = 3),
                 'dob' => $dob,
-                'age' => Carbon::parse($dob)->diff(Carbon::now())->format('%y'),
                 'numOfChildren' => $faker->numberBetween($min = 0, $max = 3),
                 'bio'  => $faker->realText($maxNbChars = 200, $indexSize = 2),
                 

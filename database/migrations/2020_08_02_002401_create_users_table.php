@@ -33,7 +33,6 @@ class CreateUsersTable extends Migration
             $table->foreign('marital_status_id')->references('id')->on('marital_statuses');
 
             $table->date('dob');
-            $table->integer('age');
             $table->integer('numOfChildren');
             $table->text('bio');
             $table->string('imageAddress')->nullable();

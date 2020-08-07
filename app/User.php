@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Demency\Friendships\Traits\Friendable;
 use App\Notifications\ResetPassword as ResetPasswordNotification;
+use \Carbon\Carbon;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -20,7 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         // User's personal details
-        'firstNames', 'surname', 'prefName', 'email', 'password', 'phoneNumber', 'city_id', 'gender_id', 'marital_status_id', 'dob', 'age', 'numOfChildren', 'bio', 'imageAddress',
+        'firstNames', 'surname', 'prefName', 'email', 'password', 'phoneNumber', 'city_id', 'gender_id', 'marital_status_id', 'dob', 'numOfChildren', 'bio', 'imageAddress',
         
         'prefMinAge', 'prefMaxAge', 'prefMaxNumOfChildren', 'prefMaritalStatuses',
         //  'prefCities',  'prefGenders',
@@ -47,20 +48,31 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'age'
+    ];
+
+    public function getAgeAttribute() {
+        return (int) Carbon::parse($this->dob)->diff(Carbon::now())->format('%y');
+    }
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    public function city(){
+    public function city()
+    {
         return $this->belongsTo(City::class)->select(['id', 'name']);
     }
 
-    public function gender(){
+    public function gender()
+    {
         return $this->belongsTo(Gender::class)->select(['id', 'name']);
     }
 
-    public function maritalStatus(){
+    public function maritalStatus()
+    {
         return $this->belongsTo(MaritalStatus::class)->select(['id', 'name']);
     }
 

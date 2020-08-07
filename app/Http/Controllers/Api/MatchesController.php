@@ -22,11 +22,11 @@ class MatchesController extends Controller
     public function getAcceptedMatches(){
         $friends = request()->user()->getFriends(10);
         if(count($friends) == 0)
-        // if no matches are found, return a message
-        return response()->json([
-            'success' -> false,
-            'message' => 'No Matches',
-            ]);
+            // if no matches are found, return a message
+            return response()->json([
+                'success' => false,
+                'message' => 'No Matches',
+                ]);
             
         // if matches are found return them as JSON
         foreach($friends as $friend){

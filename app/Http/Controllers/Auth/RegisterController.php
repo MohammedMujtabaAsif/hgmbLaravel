@@ -104,7 +104,6 @@ class RegisterController extends Controller
             'gender_id' => (int) $data['gender_id'],
             'marital_status_id' => (int) $data['marital_status_id'], 
             'dob' => $data['dob'],
-            'age' => Carbon::parse($data['dob'])->diff(Carbon::now())->format('%y'),
             'numOfChildren' => $data['numOfChildren'],
             'bio' => $data['bio'],
             //imageAddress NOT COMPLETE

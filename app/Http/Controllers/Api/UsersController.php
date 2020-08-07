@@ -114,7 +114,6 @@ class UsersController extends Controller
       'gender_id' => (int) $request['gender_id'],
       'marital_status_id' => (int) $request['marital_status_id'], 
       'dob' => Carbon::createFromFormat('Y-m-d', $request['dob']),
-      'age' => Carbon::parse($request['dob'])->diff(Carbon::now())->format('%y'),
       'numOfChildren' => $request['numOfChildren'],
       'bio' => $request['bio'],
       // TODO: imageAddress
