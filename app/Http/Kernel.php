@@ -63,7 +63,8 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         // Custom middleware to check user is admin approved
-        'approved' => \App\Http\Middleware\ApprovedCheck::class
+        'approved' => \App\Http\Middleware\ApprovedCheck::class,
+        'CustomEmailVerified' => \App\Http\Middleware\CustomEmailVerified::class,
     ];
 
     /**
