@@ -28,11 +28,11 @@ class UsersTableSeeder extends Seeder
 
             $gender = $faker->numberBetween($min = 1, $max = 2);
 
-            if($gender==1){
+            $prefGender = 1;
+
+            if($gender==1)
                 $prefGender = 2;
-            }else{
-                $prefGender = 1;
-            }
+                
 
             $user = User::create([
                 'firstNames' => $firstName,
