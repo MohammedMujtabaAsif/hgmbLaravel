@@ -15,34 +15,32 @@ class ApprovedCheck
      */
     public function handle($request, Closure $next)
     {
-
+        // Check user is banned
+        if($request->user()->adminBanned == 1){
+            //Return a message explaining ban
+            $code = 403;
+            $message = "Banned by Admins";
+            if(!empty($request->user()->adminBannedMessage))
+                $message = "Banned: " . $request->user()->adminBannedMessage;
+        }
         // Check user is approved by admin's
-        if($request->user()->adminApproved == 1){
+        elseif($request->user()->adminApproved == 1){
             // Return the Route the User attempted to access
             return $next($request);
         }
-        elseif($request->user()->adminBanned == 1)
-        {
-            if(!empty($request->user()->adminBannedMessage))
-                $message = "Banned: " . $request->user()->adminBannedMessage;
-            else
-                $message = "Banned by Admins";
-            $code = 403;
-        }
-        else
-        {
-            if(!empty($request->user()->adminUnapprovedMessage))
-                $message = "Unapproved: " . $request->user()->adminUnapprovedMessage;
-            else
-                $message = "Awaiting Admin Approval";
+        // if not banned or approved, User must be unapproved
+        else{
+            // Return message explaining uapproval
             $code = 401;
+            $message = "Awaiting Admin Approval";
+            if(!empty($request->user()->adminUnapprovedMessage))
+                $message = "Unapproved: " . $request->user()->adminUnapprovedMessage . ". You may update your account details to request approval again.";
         }
 
         // Return JSON message explaining lack of access
         return response()->json([
             'success' => false,
             'message' => $message,
-            'code' => $code,
-            ]);
+        ], $code);
     }
 }
