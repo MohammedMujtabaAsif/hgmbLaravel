@@ -207,12 +207,13 @@ class UsersController extends Controller
     if(count($users) === 0)
       return response()->json([
         'success' => false,
-        'message' => 'No Other Users Have Been Approved Yet']);
+        'message' => 'No Other Users Have Been Approved Yet'
+      ]);
 
     return response()->json([
       'success' => true,
       'data' => $users,
-      ]);
+    ]);
   }
 
 

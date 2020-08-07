@@ -18,12 +18,12 @@ class CustomEmailVerified
      public function handle($request, Closure $next)
      {
          if (! $request->user() ||
-             ($request->user() instanceof MustVerifyEmail &&
-             ! $request->user()->hasVerifiedEmail())) {
-             return response()->json([
-                         'success' => false,
-                         'message' => 'You Must Verify Your Email Address',
-                         ], 403);
+            ($request->user() instanceof MustVerifyEmail &&
+            ! $request->user()->hasVerifiedEmail())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You Must Verify Your Email Address',
+            ], 403);
          }
 
          return $next($request);
