@@ -15,11 +15,11 @@ use Route;
 */
 
 // Allow any user to reach these routes
-Route::post('register', 'Api\RegisterController@register')->name('user.register');
-Route::post('login', 'Api\LoginController@login')->name('user.login');
+Route::post('post/register', 'Api\RegisterController@register')->name('user.register');
+Route::post('post/login', 'Api\LoginController@login')->name('user.login');
 
 // Password reset routes
-Route::post('password/sendResetEmail', 'Auth\ForgotPasswordController@sendResetLinkEmail');
+Route::post('post/password/sendResetEmail', 'Auth\ForgotPasswordController@sendResetLinkEmail');
 // Route::post('password/resetPassword', 'Api\ResetPasswordController@reset');
 
 // Email Verification route
@@ -27,9 +27,10 @@ Route::get('email/verify/{id}/{hash}', 'Api\VerificationController@verify')->nam
 
 Route::group(['middleware' => ['auth:api']], function(){
     // Allow users who are authenticated to access these routes
-    Route::get('logout', 'Api\LoginController@logout');
-    Route::post('deleteAccount', 'Api\UsersController@deleteAccount');
-    Route::get('user', 'Api\UsersController@getCurrentUser');
+    Route::get('get/logout', 'Api\LoginController@logout');
+    Route::get('get/user', 'Api\UsersController@index');
+    Route::post('post/deleteAccount', 'Api\UsersController@delete');
+    Route::post('post/updateAccount', 'Api\UsersController@update');
     
     // Resend Email Verification route
     Route::get('email/resend', 'Api\VerificationController@resend')->middleware('auth:api')->name('verification.resend');
@@ -37,18 +38,29 @@ Route::group(['middleware' => ['auth:api']], function(){
         Route::group(['middleware' => ['verified', 'approved']], function () {
             // Only allow user's who are admin approved and
             // have verified their email address to reach these routes
-            Route::get('/verify', 'Api\UsersController@verificationCheck');
-            Route::get('allOtherUsers', 'Api\UsersController@getAllOtherUsers');
-            // Route::get('getMatches', 'Api\UsersController@allMatches');
-            Route::get('getMatchedUsers', 'Api\UsersController@getMatchedUsers');
-            Route::post('sendMatchRequest', 'Api\UsersController@sendMatchRequest');
-            Route::get('getMatchRequests','Api\UsersController@getMatchRequests');
-            Route::post('acceptMatchRequest', 'Api\UsersController@acceptMatchRequest');
-            Route::post('denyMatchRequest', 'Api\UsersController@denyMatchRequest');
-            Route::post('unmatch', 'Api\UsersController@unmatch');
-            Route::post('blockUser', 'Api\UsersController@blockUser');
-            Route::post('unblockUser', 'Api\UsersController@unblockUser');
-            Route::post('userWithID', 'Api\UsersController@getUserWithID');
+            Route::group(['prefix' => 'get'], function () {
+                Route::get('verify', 'Api\UsersController@verificationCheck');
+
+                Route::get('allOtherUsers', 'Api\UsersController@getAllOtherUsers');
+                // Route::get('matchRequests','Api\UsersController@getMatchRequests');
+                Route::get('pendingMatches', 'Api\UsersController@getPendingMatches');
+                Route::get('deniedMatches', 'Api\UsersController@getDeniedMatches');
+
+                Route::get('acceptedMatches', 'Api\UsersController@getAcceptedMatches');
+
+                Route::get('blockedMatches', 'Api\UsersController@getBlockedMatches');
+            });
+
+            Route::group(['prefix' => 'post'], function () {
+                Route::post('userWithID', 'Api\UsersController@getUserWithID');
+
+                Route::post('sendMatchRequest', 'Api\UsersController@sendMatchRequest');
+                Route::post('acceptMatchRequest', 'Api\UsersController@acceptMatchRequest');
+                Route::post('denyMatchRequest', 'Api\UsersController@denyMatchRequest');
+                Route::post('unmatch', 'Api\UsersController@unmatch');
+                Route::post('blockMatch', 'Api\UsersController@blockMatch');
+                Route::post('unblockMatch', 'Api\UsersController@unblockMatch');
+            });
             
             // Route::apiResources(['appointments' => 'Api\AppointmentsController']);        
     });
