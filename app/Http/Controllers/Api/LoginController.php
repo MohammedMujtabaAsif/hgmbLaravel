@@ -22,15 +22,16 @@ class LoginController extends Controller
     public function login()
     {
         //Validate The request data      
-        $validator = Validator::make(request()->all(),['email' => 'required|email', 'password' => 'required']);
-        // return response()->json(['message' => $validator]);
+        $validator = Validator::make(request()->all(),[
+            'email' => 'required|email',
+            'password' => 'required'
+            ]);
 
         if ($validator->fails()) {
             return response()->json([
             'success' => false,
             'message' => $validator->errors(),
-            'code' => 400,
-            ]);
+            ], 400);
         }
 
         //Attempt to login user with request details
@@ -44,19 +45,16 @@ class LoginController extends Controller
                 'success' => true,
                 'token' => $token,
                 'user' => $user,
-                'code' => 200,
-            ]);
+            ], 200);
         }
 
-        //elseif authentication is unsuccessful
-        else {
-            // return an unsuccessful JSON error message
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid Email or Password',
-                'code' => 401,
-            ]);
-        }
+        
+        // return an unsuccessful JSON error message
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid Email or Password',
+        ], 401);
+        
     }
 
 
@@ -74,15 +72,13 @@ class LoginController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Logout successful',
-                'code' => 200,
             ]);
         }
-        else {
-            //if lougout request failed return negative message
-            return response()->json([
-                'success' => false,
-                'message' => 'Unable to Logout',
-            ]);
-        }
+        
+        //if lougout request failed return negative message
+        return response()->json([
+            'success' => false,
+            'message' => 'Unable to Logout',
+        ]);
     }
 }
