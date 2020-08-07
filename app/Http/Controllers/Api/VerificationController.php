@@ -81,7 +81,7 @@ class VerificationController extends Controller
         }
 
         session()->flash('status.level', 'success');
-        session()->flash('status.message', 'Email Successfully Verifed');
+        session()->flash('status.message', 'Email Address Successfully Verifed');
         return view('welcome');
     }
 
@@ -105,11 +105,16 @@ class VerificationController extends Controller
     public function resend(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return response(['message' => 'Email Verified Already']);
+            return response([
+                'success' => false,
+                'message' => 'Email Address Already Verified']);
         }
 
         $request->user()->sendEmailVerificationNotification();
 
-        return response(['message' => 'Verification Email Sent']);
+        return response([
+            'success' => true,
+            'message' => 'Verification Email Sent. Please check your email.'
+            ]);
     }
 }
