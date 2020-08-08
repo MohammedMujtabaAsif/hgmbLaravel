@@ -92,7 +92,7 @@ class MatchesController extends Controller
         elseif($user->befriend($recipient)==true){
             return response()->json([        
                 'success' => true,
-                'message' => 'Match Sent to ' . $recipient->prefName,
+                'message' => 'Match Request Sent to ' . $recipient->prefName,
             ]);
         }
                                                     
