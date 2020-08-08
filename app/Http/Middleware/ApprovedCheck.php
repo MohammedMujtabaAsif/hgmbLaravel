@@ -21,7 +21,7 @@ class ApprovedCheck
             $code = 403;
             $message = "Banned by Admins";
             if(!empty($request->user()->adminBannedMessage))
-                $message = "Banned: " . $request->user()->adminBannedMessage;
+                $message = $request->user()->adminBannedMessage;
         }
         // Check user is approved by admin's
         elseif($request->user()->adminApproved == 1){
@@ -34,7 +34,7 @@ class ApprovedCheck
             $code = 401;
             $message = "Awaiting Admin Approval";
             if(!empty($request->user()->adminUnapprovedMessage))
-                $message = "Unapproved: " . $request->user()->adminUnapprovedMessage . ". You may update your account details to request approval again.";
+                $message = $request->user()->adminUnapprovedMessage . ". You may update your account details to request approval again.";
         }
 
         // Return JSON message explaining lack of access
