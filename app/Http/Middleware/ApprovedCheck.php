@@ -19,6 +19,7 @@ class ApprovedCheck
         if($request->user()->adminBanned == 1){
             //Return a message explaining ban
             $code = 403;
+            $type = "banned";
             $message = "Banned by Admins";
             if(!empty($request->user()->adminBannedMessage))
                 $message = $request->user()->adminBannedMessage;
@@ -32,6 +33,7 @@ class ApprovedCheck
         else{
             // Return message explaining uapproval
             $code = 401;
+            $type = "unapproved";
             $message = "Awaiting Admin Approval";
             if(!empty($request->user()->adminUnapprovedMessage))
                 $message = $request->user()->adminUnapprovedMessage;
@@ -41,6 +43,7 @@ class ApprovedCheck
         return response()->json([
             'success' => false,
             'message' => $message,
+            'type' => $type,
         ], $code);
     }
 }

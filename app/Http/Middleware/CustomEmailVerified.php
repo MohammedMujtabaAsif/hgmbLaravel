@@ -23,6 +23,7 @@ class CustomEmailVerified
             return response()->json([
                 'success' => false,
                 'message' => 'You Must Verify Your Email Address',
+                'type' => 'unverified'
             ], 403);
          }
 
