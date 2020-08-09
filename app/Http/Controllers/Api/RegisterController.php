@@ -81,7 +81,7 @@ class RegisterController extends Controller
                 'email' => $request['email'],
                 'password' => bcrypt($request['password']),
                 'phoneNumber' => $request['phoneNumber'],
-                'dob' => Carbon::createFromFormat('dd/mm/yyyy', $request['dob']),
+                'dob' => Carbon::createFromFormat('Y/m/d', $request['dob']),
                 'numOfChildren' => (int) $request['numOfChildren'],
                 'bio' => $request['bio'],
                 'city_id' => (int) $request['city_id'],
@@ -98,6 +98,21 @@ class RegisterController extends Controller
             $user->prefCities()->sync((int) $request['pref_cities']);
             $user->prefGenders()->sync((int) $request['pref_genders']);
             $user->prefMaritalStatuses()->sync((int) $request['pref_marital_statuses']);
+
+            $user = $user->with('gender')
+                    ->with('city')
+                    ->with('maritalStatus')
+                    ->with('prefCities')
+                    ->with('prefGenders')
+                    ->with('prefMaritalStatuses')
+                    ->first()
+                    ->makeVisible([
+                        'firstNames',
+                        'surname',
+                        'email',
+                        'phoneNumber',
+                        'dob',
+                    ]);
 
             $token['token'] = $user->createToken('appToken')->accessToken;
 
