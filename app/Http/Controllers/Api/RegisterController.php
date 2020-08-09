@@ -32,12 +32,15 @@ class RegisterController extends Controller
             'email' => 'required|unique:users|email',
             'password' => 'required|string|confirmed',
             'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users',
+            'dob'=>'required|date|before:18 years ago|after:70 years ago',
+            'numOfChildren'=>'integer',
+            'bio'=>'required|string|max:1000',
             'city_id' => 'required|integer|min:1|max:3',
             'gender_id'=>'required|integer|min:1|max:2',
             'marital_status_id'=>'required|integer|min:1|max:3',
-            'dob'=>'required|date|before:18 years ago|after:65 years ago',
-            'numOfChildren'=>'integer',
-            'bio'=>'required|string|max:1000',
+            'prefMinAge'=>'required|integer|min:18|lt:prefMaxAge',
+            'prefMaxAge'=>'required|integer|min:20|gt:prefMinAge',
+            'prefMaxNumOfChildren'=>'required|integer',
             'image' => 'file|max:5000',
 
             //Validate user's partner preferences
@@ -47,9 +50,6 @@ class RegisterController extends Controller
             'pref_genders.*'=>'integer|min:1|max:2',
             'pref_marital_statuses'=>'required|array|distinct',
             'pref_marital_statuses.*'=>'integer|min:1|max:3',
-            'pref_min_age'=>'required|integer|min:18',
-            'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
-            'pref_num_of_children'=>'required|integer',
         ]);
     }
 
@@ -62,13 +62,7 @@ class RegisterController extends Controller
      * @return Response success User
      */
     public function register(Request $request)
-        {
-
-            $prefGender =1;
-
-            if($request['gender_id']==1){
-                $prefGender = 2;
-            }            
+        {          
 
             $validator = $this->validator($request->all());
 
@@ -101,9 +95,9 @@ class RegisterController extends Controller
                 'prefMaxNumOfChildren' => (int) $request['prefMaxNumOfChildren'],
             ]);
 
-            $user->prefCities()->sync((int) $request['prefCities']);
-            $user->prefGenders()->sync((int) $request['prefGenders']);
-            $user->prefMaritalStatuses()->sync((int) $request['prefMaritalStatuses']);
+            $user->prefCities()->sync((int) $request['pref_cities']);
+            $user->prefGenders()->sync((int) $request['pref_genders']);
+            $user->prefMaritalStatuses()->sync((int) $request['pref_marital_statuses']);
 
             $token['token'] = $user->createToken('appToken')->accessToken;
 
