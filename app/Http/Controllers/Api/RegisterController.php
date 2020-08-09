@@ -87,24 +87,23 @@ class RegisterController extends Controller
                 'email' => $request['email'],
                 'password' => bcrypt($request['password']),
                 'phoneNumber' => $request['phoneNumber'],
+                'dob' => Carbon::createFromFormat('dd/mm/yyyy', $request['dob']),
+                'numOfChildren' => (int) $request['numOfChildren'],
+                'bio' => $request['bio'],
                 'city_id' => (int) $request['city_id'],
                 'gender_id' => (int) $request['gender_id'],
-                'marital_status_id' => (int) $request['marital_status_id'], 
-                'dob' => Carbon::createFromFormat('Y-m-d', $request['dob']),
-                'numOfChildren' => $request['numOfChildren'],
-                'bio' => $request['bio'],
+                'marital_status_id' => (int) $request['marital_status_id'],
                 // TODO: imageAddress
 
-
                 //User's partner preferences
-                'prefMinAge' => (int) $request['pref_min_age'],
-                'prefMaxAge' => (int) $request['pref_max_age'],
-                'prefMaxNumOfChildren' => (int) $request['pref_num_of_children'],
+                'prefMinAge' => (int) $request['prefMinAge'],
+                'prefMaxAge' => (int) $request['prefMaxAge'],
+                'prefMaxNumOfChildren' => (int) $request['prefMaxNumOfChildren'],
             ]);
 
-            $user->prefCities()->sync((int) $request['pref_cities']);
-            $user->prefGenders()->sync((int) $prefGender);
-            $user->prefMaritalStatuses()->sync((int) $request['pref_marital_statuses']);
+            $user->prefCities()->sync((int) $request['prefCities']);
+            $user->prefGenders()->sync((int) $request['prefGenders']);
+            $user->prefMaritalStatuses()->sync((int) $request['prefMaritalStatuses']);
 
             $token['token'] = $user->createToken('appToken')->accessToken;
 
