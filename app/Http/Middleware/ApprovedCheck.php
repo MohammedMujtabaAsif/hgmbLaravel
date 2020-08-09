@@ -34,7 +34,7 @@ class ApprovedCheck
             $code = 401;
             $message = "Awaiting Admin Approval";
             if(!empty($request->user()->adminUnapprovedMessage))
-                $message = $request->user()->adminUnapprovedMessage . ". You may update your account details to request approval again.";
+                $message = $request->user()->adminUnapprovedMessage;
         }
 
         // Return JSON message explaining lack of access
