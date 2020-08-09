@@ -26,7 +26,7 @@ Route::post('post/password/sendResetEmail', 'Auth\ForgotPasswordController@sendR
 
 
 // Email Verification route
-Route::get('email/verify/{id}/{hash}', 'Api\VerificationController@verify')->name('verification.verify');
+Route::get('post/email/verify/{id}/{hash}', 'Api\VerificationController@verify')->name('verification.verify');
 
 
 Route::group(['middleware' => ['auth:api']], function(){
@@ -38,6 +38,8 @@ Route::group(['middleware' => ['auth:api']], function(){
     Route::group(['prefix' => 'get'], function () {
         Route::get('logout', 'Api\LoginController@logout');
         Route::get('user', 'Api\UsersController@index');
+        // Resend Email Verification route
+        Route::get('email/resend', 'Api\VerificationController@resend')->middleware('auth:api')->name('verification.resend');
     });
 
 
@@ -48,8 +50,6 @@ Route::group(['middleware' => ['auth:api']], function(){
     });
 
     
-    // Resend Email Verification route
-    Route::get('email/resend', 'Api\VerificationController@resend')->middleware('auth:api')->name('verification.resend');
 
         Route::group(['middleware' => ['CustomEmailVerified', 'approved']], function () {
             // Allow users who:
