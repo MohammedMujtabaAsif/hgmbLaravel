@@ -115,14 +115,16 @@ class UsersController extends Controller
       'prefMinAge' => $request['pref_min_age'],
       'prefMaxAge' => $request['pref_max_age'],
       'prefMaxNumOfChildren' => $request['pref_num_of_children'],
-      'adminApproved' => 0,
+      
     ]);
 
     $user->prefCities()->sync($request['pref_cities']);
     $user->prefGenders()->sync($request['pref_genders']);
     $user->prefMaritalStatuses()->sync($request['pref_marital_statuses']);
-    
-    
+
+    $user->adminApproved = 0;
+
+    $user->save();
 
     return $this->index();
   }
