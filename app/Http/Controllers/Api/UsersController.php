@@ -67,7 +67,6 @@ class UsersController extends Controller
       'surname' => 'required|string',
       'prefName'=>'required|string',
       'email' => 'required|unique:users,email,' . $request->user()->id,
-      'password' => 'required|string|confirmed',
       'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users,phoneNumber,' . $request->user()->id,
       'city_id' => 'required|integer|min:1|max:3',
       'gender_id'=>'required|integer|min:1|max:2',
@@ -102,7 +101,6 @@ class UsersController extends Controller
       'surname' => $request['surname'],
       'prefName'=> $request['prefName'],
       'email' => $request['email'],
-      'password' => bcrypt($request['password']),
       'phoneNumber' => $request['phoneNumber'],
       'city_id' => (int) $request['city_id'],
       'gender_id' => (int) $request['gender_id'],
@@ -117,11 +115,14 @@ class UsersController extends Controller
       'prefMinAge' => $request['pref_min_age'],
       'prefMaxAge' => $request['pref_max_age'],
       'prefMaxNumOfChildren' => $request['pref_num_of_children'],
+      'adminApproved' => 0,
     ]);
 
     $user->prefCities()->sync($request['pref_cities']);
     $user->prefGenders()->sync($request['pref_genders']);
     $user->prefMaritalStatuses()->sync($request['pref_marital_statuses']);
+    
+    
 
     return $this->index();
   }
