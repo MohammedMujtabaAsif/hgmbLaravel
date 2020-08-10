@@ -21,7 +21,7 @@ class MatchesController extends Controller
     * @return Response
     */
     public function getIncomingFriendRequests(){
-        $friendRequests = request()->user()->getFriendRequests(10);
+        $friendRequests = request()->user()->getFriendRequests();
         
         $senders = array();
         
@@ -342,6 +342,42 @@ class MatchesController extends Controller
             'message' => 'There is No Match Request From ' . $sender->prefName,
         ]);
     }
+
+
+    public function deleteFriendRequest(Request $request){
+        $user = $request->user();
+        $recipient= User::where('id', $request['id'])->first();
+ 
+        // check user was found
+        if(is_null($recipient))
+            // if they could not be found, return unsuccessful response
+            return response()->json([
+                'success' => false,
+                'message' => 'Could Not Find User'
+            ]);
+
+        if($user->hasSentFriendRequestTo($recipient)){
+            if($recipient->acceptFriendRequest($user) && $user->unfriend($recipient)){
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Friend Request Deleted'
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Could Not Delete Request'
+            ]);
+            
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'You Have Not Sent A Match Request To ' . $recipient->prefName,
+        ]);
+        
+    }
+
+
 
 
     /**

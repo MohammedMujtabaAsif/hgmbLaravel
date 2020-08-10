@@ -83,6 +83,7 @@ Route::group(['middleware' => ['auth:api']], function(){
                 Route::post('sendFriendRequest', 'Api\MatchesController@sendFriendRequest');
                 Route::post('acceptFriendRequest', 'Api\MatchesController@acceptFriendRequest');
                 Route::post('denyFriendRequest', 'Api\MatchesController@denyFriendRequest');
+                Route::post('deleteFriendRequest', 'Api\MatchesController@deleteFriendRequest');
                 Route::post('unfriend', 'Api\MatchesController@unfriend');
                 Route::post('blockFriend', 'Api\MatchesController@blockFriend');
                 Route::post('unblockFriend', 'Api\MatchesController@unblockFriend');
