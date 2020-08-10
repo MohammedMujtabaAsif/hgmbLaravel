@@ -99,20 +99,14 @@ class RegisterController extends Controller
             $user->prefGenders()->sync((int) $request['pref_genders']);
             $user->prefMaritalStatuses()->sync((int) $request['pref_marital_statuses']);
 
-            $user = $user->with('gender')
-                    ->with('city')
-                    ->with('maritalStatus')
-                    ->with('prefCities')
-                    ->with('prefGenders')
-                    ->with('prefMaritalStatuses')
-                    ->first()
-                    ->makeVisible([
-                        'firstNames',
-                        'surname',
-                        'email',
-                        'phoneNumber',
-                        'dob',
-                    ]);
+            $user = $user->first()
+                        ->makeVisible([
+                            'firstNames',
+                            'surname',
+                            'email',
+                            'phoneNumber',
+                            'dob',
+                        ]);
 
             $token['token'] = $user->createToken('appToken')->accessToken;
 

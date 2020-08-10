@@ -23,20 +23,14 @@ class UsersController extends Controller
   public function index()
   {    
     $user = User::where('id', auth()->user()->id)
-      ->with('gender')
-      ->with('city')
-      ->with('maritalStatus')
-      ->with('prefCities')
-      ->with('prefGenders')
-      ->with('prefMaritalStatuses')
-      ->first()
-      ->makeVisible([
-        'firstNames',
-        'surname',
-        'email',
-        'phoneNumber',
-        'dob',
-      ]);
+                ->first()
+                ->makeVisible([
+                  'firstNames',
+                  'surname',
+                  'email',
+                  'phoneNumber',
+                  'dob',
+                ]);
 
     if(is_null($user))
       return response()->json([
@@ -192,17 +186,10 @@ class UsersController extends Controller
     // $users = auth()->user()->getAllFriendships();
     //TODO: Make SELECT query using User's preferences
 
-    $users = User::
-        with('gender')
-      ->with('city')
-      ->with('maritalStatus')
-      ->with('prefCities')
-      ->with('prefGenders')
-      ->with('prefMaritalStatuses')
-      ->where('id', '!=', auth()->user()->id)
-      ->where('adminApproved', 1)
-      ->where('adminBanned', 0)
-      ->paginate(20);
+    $users = User::where('id', '!=', auth()->user()->id)
+                  ->where('adminApproved', 1)
+                  ->where('adminBanned', 0)
+                  ->paginate(20);
 
     if(count($users) === 0)
       return response()->json([
@@ -225,14 +212,7 @@ class UsersController extends Controller
     * @return Response
     */
   public function getUserWithID(Request $request){
-      $user = User::
-        with('gender')
-      ->with('city')
-      ->with('maritalStatus')
-      ->with('prefCities')
-      ->with('prefGenders')
-      ->with('prefMaritalStatuses')
-      ->where('id', $request['id'])->first();
+      $user = User::where('id', $request['id'])->first();
 
       if(is_null($user))
         return response()->json([
