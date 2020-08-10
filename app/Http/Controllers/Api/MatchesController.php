@@ -15,164 +15,96 @@ use App\User;
 class MatchesController extends Controller
 {
     /**
-    * Get users matched with authenticated user
+    * Get friend requests requests from other users
+    *
     *
     * @return Response
     */
-    public function getAcceptedMatches(){
-        $friends = request()->user()->getFriends(10);
-
-        if(count($friends) == 0)
-            // if no matches are found, return a message
-            return response()->json([
-                'success' => false,
-                'message' => 'No Matches',
-            ]);
-            
-        // if matches are found return them as JSON
-        foreach($friends as $friend){
-            $friend->gender;
-            $friend->city;
-            $friend->maritalStatus;
-            $friend->prefCities;
-            $friend->prefGenders;
-            $friend->prefMaritalStatuses;
-        }
-                
-        return response()->json([
-            'success' => true,
-            'data' => $friends
-        ]);
-    }
-
-
-    /**
-    * Send match request to another user
-    *
-    * @param Request $request id non-authed user
-    *
-    * @return Response
-    */
-    public function sendMatchRequest(Request $request)
-    {
-        $user = $request->user();
-        $recipient = User::where('id', $request['id'])->first();
+    public function getIncomingFriendRequests(){
+        $friendRequests = request()->user()->getFriendRequests(10);
         
-        //Check match sender is not already matched with send
-        if($user->isFriendWith($recipient)){
-            return response()->json([
-                'success' => false,
-                'message' => 'Already Matched with ' . $recipient->prefName,
-            ]);
-        }
-                
-        elseif($user->isBlockedBy($recipient)){
-            return response()->json([
-                'success' => false,
-                'message' => $recipient->prefName . ' has Blocked You',
-            ]);
-        }
-                        
-        elseif($user->hasSentFriendRequestTo($recipient)){
-            return response()->json([
-                'success' => false,
-                'message' => 'You Have Already Sent a Match Request to ' . $recipient->prefName,
-            ]);
-        }
-                                
-        elseif($user->hasFriendRequestFrom($recipient)){
-            if($user->befriend($recipient)){
-                return response()->json([        
-                    'success' => true,
-                    'message' => 'You Matched with ' . $recipient->prefName,
-                ]);
-            }
-        }
-                                            
-        elseif($user->befriend($recipient)==true){
-            return response()->json([        
-                'success' => true,
-                'message' => 'Match Request Sent to ' . $recipient->prefName,
-            ]);
-        }
-                                                    
-        return response()->json([
-            'success' => false,
-            'message' => 'Unable to Send Match Request to ' . $recipient->prefName,
-        ]);
-}
-
-
-    /**
-    * Get match requests from other users
-    *
-    *
-    * @return Response
-    */
-    public function getPendingMatches(){
-        $pendingMatches = request()->user()->getFriendRequests(10);
-        
-
         $senders = array();
         
-        foreach($pendingMatches as $matchRequest){
-            $sender = $matchRequest->sender;
-            $sender->gender;
-            $sender->city;
-            $sender->maritalStatus;
-            $sender->prefCities;
-            $sender->prefGenders;
-            $sender->prefMaritalStatuses;
+        // extract the sender from the list of friend requests
+        foreach($friendRequests as $friendRequest){
+            $sender = $friendRequest->sender;
             $senders[] = $sender;
         }
 
+        // check there are no incoming requests
         if(count($senders) === 0){
+            // if there are no incoming requests, return unsucessful message
             return response()->json([
                 'success' => false,
-                'message' => 'No Match Requests Found',
+                'message' => 'No Incoming Match Requests',
             ]);
         }
         
+        // return positive message with list of incoming match requests
         return response()->json([
             'success' => true,
             'data' => $senders
         ]);
     }
 
+
     /**
-    * Get match requests sent to other users
+    * Get friend requests requests sent to other users
     *
     *
     * @return Response
     */
-    public function getSentRequests(){
-        $pendingRequests = request()->user()->getPendingFriendships(10);
-
+    public function getOutgoingFriendRequests(){
+        $friendRequests = request()->user()->getPendingFriendships(10);
+        $id = request()->user()->id;
 
         $recipients = array();
-        
-        foreach($pendingRequests as $matchRequest){
-            $recipient = $matchRequest->recipient;
-            $recipient->gender;
-            $recipient->city;
-            $recipient->maritalStatus;
-            $recipient->prefCities;
-            $recipient->prefGenders;
-            $recipient->prefMaritalStatuses;
-            $recipients[] = $recipient;
+
+        // for each friendRequest, get the recipient,
+        // where the recipient is not the auth user
+        foreach($friendRequests as $friendRequest){
+            if($friendRequest->recipient->id!=$id){
+                $recipients[] = $friendRequest->recipient;
+            }
         }
         
-        if(count($recipients) === 0){
+        // check there are no recipients
+        if(count($recipients) == 0){
+            // if there are no recipients, return unsuccessful message
             return response()->json([
                 'success' => false,
-                'message' => 'No Pending Matches',
+                'message' => 'No Outgoing Match Requests',
             ]);
         }
         
-        
+        // return positive message with list of outgoing friend requests        
         return response()->json([
             'success' => true,
             'data' => $recipients
+        ]);
+    }
+
+
+    /**
+    * Get users matched with authenticated user
+    *
+    * @return Response
+    */
+    public function getAcceptedFriendRequests(){
+        $friends = request()->user()->getFriends(10);
+
+        // check there are no friends found
+        if(count($friends) == 0)
+            // if no friends are found, return unsuccessful message
+            return response()->json([
+                'success' => false,
+                'message' => 'No Matches',
+            ]);
+
+        // if friend requests are found return them as JSON        
+        return response()->json([
+            'success' => true,
+            'data' => $friends
         ]);
     }
 
@@ -182,30 +114,29 @@ class MatchesController extends Controller
     *
     *  @return Response deniedUsers
     */
-    public function getDeniedMatches(){
-        $deniedMatches = request()->user()->getDeniedFriendships(10);
-        
+    public function getDeniedFriendRequests(){
+        $deniedRequests = request()->user()->getDeniedFriendships(10);
+        $id = request()->user()->id;
+
         $deniedUsers = array();
         
-        foreach($deniedMatches as $deniedMatch){
-            $deniedUser = $deniedMatch->sender;
-            if($deniedUser->id != request()->user()->id){
-                $deniedUser->gender;
-                $deniedUser->city;
-                $deniedUser->maritalStatus;
-                $deniedUser->prefCities;
-                $deniedUser->prefGenders;
-                $deniedUser->prefMaritalStatuses;
-                $deniedUsers[] = $deniedUser;
+        // for each deniedmatch, get the sender of the match
+        // where the sender is not the auth user
+        foreach($deniedRequests as $deniedRequest){
+            if($deniedRequest->sender->id != $id){
+                $deniedUsers[] = $deniedRequest->sender;
             }
         }
 
+        // check there are no deniedUsers
         if(count($deniedUsers) == 0)
+            // if there no deniedUsers, return unsuccessful message
             return response()->json([
                 'success' => false,
                 'message' => "No Denied Matches Found"
             ]);
 
+        //return positive message with list of deniedUsers
         return response()->json([
             'success' => true,
             'data' => $deniedUsers
@@ -218,69 +149,149 @@ class MatchesController extends Controller
     *
     *  @return Response blockedUsers
     */
-    public function getBlockedMatches(){
-        $blockedUsers = request()->user()->getBlockedFriendships(10);
+    public function getBlockedFriends(){
+        $blockedFriends = request()->user()->getBlockedFriendships(10);
+        $id = request()->user()->id;
 
-        $blocked = array();
+        $blockedUsers = array();
 
-        foreach($blockedUsers as $blockedUser){
-            $recipient = $blockedUser->recipient;
-            if($recipient->id != request()->user()->id){
-                $recipient->gender;
-                $recipient->city;
-                $recipient->maritalStatus;
-                $recipient->prefCities;
-                $recipient->prefGenders;
-                $recipient->prefMaritalStatuses;
-                $blocked[] = $recipient;
+        // for each blocked user, retrieve the recipient
+        // where the recipient isn't the auth user
+        foreach($blockedFriends as $blockedFriend){
+            if($blockedFriend->recipient->id != $id){
+                $blockedUsers[] = $blockedFriend->recipient;
             }
         }
 
+        // check there no blockedUsers
+        if(count($blockedUsers) == 0)
+            // if there no blocked users, return unsuccessful message
+            return response()->json([
+                'success' => false,
+                'message' => "You Have Not Blocked Anyone"
+            ]);
         
-        if(count($blocked) == 0)
-        return response()->json([
-            'success' => false,
-            'message' => "You Have Not Blocked Anyone"
-        ]);
-        
+        // return positive message with list of users blocked by auth user
         return response()->json([
             'success' => true,
-            'data' => $blocked
+            'data' => $blockedUsers
         ]);
     }
 
+
     /**
-    * Accept a match request from another user
+    * Send friend request request to another user
     *
     * @param Request $request id non-authed user
     *
     * @return Response
     */
-    public function acceptMatchRequest(Request $request){
+    public function sendFriendRequest(Request $request)
+    {
+        $user = $request->user();
+        $recipient = User::where('id', $request['id'])->first();
+        
+        // check user was found
+        if(is_null($recipient))
+            // if they could not be found, return unsuccessful response
+            return response()->json([
+                'success' => false,
+                'message' => 'Could Not Find User'
+            ]);
+
+        // check user is blocked by recipient
+        if($user->isBlockedBy($recipient)){
+            // return fail message explaining problem
+            return response()->json([
+                'success' => false,
+                'message' => $recipient->prefName . ' has Blocked You',
+            ]);
+        }
+
+        // check user has a friend request from recipient    
+        elseif($user->hasFriendRequestFrom($recipient)){
+            // if user has pending request from recipient, accept it
+            if($user->acceptFriendRequest($recipient)){
+                // if friend request could be accepted, return successul message
+                return response()->json([        
+                    'success' => true,
+                    'message' => 'You Matched with ' . $recipient->prefName,
+                ]);
+            }             
+        }
+        
+        // check user has already sent a match request to recipient
+        elseif($user->hasSentFriendRequestTo($recipient)){
+            // if user has sent request already, return fail message explaining problem
+            return response()->json([
+                'success' => false,
+                'message' => 'You Have Already Sent a Match Request to ' . $recipient->prefName,
+            ]);
+        }
+
+        // check match sender is not already matched with recipient               
+        elseif($user->isFriendWith($recipient)){
+            // if users are friends, return fail message explaining problem
+            return response()->json([
+                'success' => false,
+                'message' => 'Already Matched with ' . $recipient->prefName,
+            ]);
+        }
+
+        // attempt to send friend request to recipient
+        elseif($user->befriend($recipient)){
+            // if friend request sent, return success message
+            return response()->json([        
+                'success' => true,
+                'message' => 'Match Request Sent to ' . $recipient->prefName,
+            ]);
+        }
+        
+        // if all conditions fail, return generic fail message
+        return response()->json([
+            'success' => false,
+            'message' => 'Unable to Send Match Request to ' . $recipient->prefName,
+        ]);
+    }
+
+
+    /**
+    * Accept a friend request from another user
+    *
+    * @param Request $request id non-authed user
+    *
+    * @return Response
+    */
+    public function acceptFriendRequest(Request $request){
         $user = $request->user();
         $sender = User::where('id', $request['id'])->first();
         
+        // check user was found
         if(is_null($sender))
-        return response()->json([
-            'success' => false,
-            'message' => 'Could Not Find User'
-        ]);
+            // if they could not be found, return unsuccessful response
+            return response()->json([
+                'success' => false,
+                'message' => 'Could Not Find User'
+            ]);
         
+        // check user has a friend request from sender
         if($user->hasFriendRequestFrom($sender)){
-            
+            // if friend requests exists, accept it
             if($user->acceptFriendRequest($sender)){
+                // if friend request was accepted, return positive response
                 return response()->json([
                     'success' => true,
                     'message' => 'Accepted Match Request from ' . $sender->prefName,
                 ]);
             }
-            
+            // if friend request could not be accepted, return unsuccessful response
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to Accept Match Request from ' . $sender->prefName,
             ]);
         }
         
+        // if user did not have friend request from sender, return unsuccessful message
         return response()->json([
             'success' => false,
             'message' => 'There is No Match Request From ' . $sender->prefName,
@@ -295,30 +306,37 @@ class MatchesController extends Controller
     *
     * @return Response
     */
-    public function denyMatchRequest(Request $request){
+    public function denyFriendRequest(Request $request){
         $user = $request->user();
         $sender = User::where('id', $request['id'])->first();
         
+        // check user was found
         if(is_null($sender))
-        return response()->json([
-            'success' => false,
-            'message' => 'Could Not Find User'
-        ]);
-            
+            // if they could not be found, return unsuccessful response
+            return response()->json([
+                'success' => false,
+                'message' => 'Could Not Find User'
+            ]);
+        
+        // check user has a friend request from sender
         if($user->hasFriendRequestFrom($sender)){
+            // if friend requests exists, deny it
             if($user->denyFriendRequest($sender)){
+                // if friend request was denied, return positive response
                 return response()->json([
                     'success' => true,
                     'message' => 'Denied Match Request from ' . $sender->prefName,
                 ]);
             }
-            
+
+            // if friend request could not be denied, return unsucessful message
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to Deny Match Request from ' . $sender->prefName,
             ]);
         }
         
+        // if user did not have friend request from sender, return unsuccessful message
         return response()->json([
             'success' => false,
             'message' => 'There is No Match Request From ' . $sender->prefName,
@@ -333,31 +351,37 @@ class MatchesController extends Controller
     *
     * @return Response
     */
-    public function unmatch(Request $request){
+    public function unfriend(Request $request){
         $user = $request->user();
         $friend = User::where('id', $request['id'])->first();
         
+        // check user was found
         if(is_null($friend))
-        return response()->json([
-            'success' => false,
-            'message' => 'Could Not Find User'
-        ]);
+            // if they could not be found, return unsuccessful response
+            return response()->json([
+                'success' => false,
+                'message' => 'Could Not Find User'
+            ]);
         
+        // check users are friends
         if(($user->isFriendWith($friend))){
-            
+            // if users are friends, unfriend them
             if($user->unfriend($friend)){
+                // if users were unfriended, return successful response
                 return response()->json([        
                     'success' => true,
                     'message' => 'Unmatched with ' . $friend->prefName
                 ]);
             }
             
+            // if users were not unfriended, return unsuccessful response
             return response()->json([        
                 'success' => false,
                 'message' => 'Failed to Unmatch with ' . $friend->prefName
             ]);
         }
         
+        // if users are not friends, return unsuccessful response
         return response()->json([
             'success' => false,
             'message' => 'You Must Match With ' . $friend->prefName . ' Before Unmatching',
@@ -372,36 +396,43 @@ class MatchesController extends Controller
     *
     * @return Response
     */
-    public function blockMatch(Request $request){
+    public function blockFriend(Request $request){
         $user = $request->user();
         $userToBlock = User::where('id', $request['id'])->first();
         
+        // check userToBlock was found
         if(is_null($userToBlock))
-        return response()->json([
-            'success' => false,
-            'message' => 'Could Not Find User'
-        ]);
+            // if they could not be found, return unsuccessful response
+            return response()->json([
+                'success' => false,
+                'message' => 'Could Not Find User'
+            ]);
         
-        if($user->hasBlocked($userToBlock) == false){
-            
+
+        // check user hasn't blocked the userToBlock
+        if(!$user->hasBlocked($userToBlock) ){
+            // attempt to block userToBlock
             if($user->blockFriend($userToBlock)){
+                // if it was successful, return successful response
                 return response()->json([        
                     'success' => true,
                     'message' => 'Blocked ' . $userToBlock->prefName,
                 ]);
             }
-            
+
+            // return unsuccessful, return response stating userToBlock was not blocked   
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to Block ' . $userToBlock->prefName
+            ]);
+        }
+    
+        // if userToBlock is already blocked, return unsuccessful message
         return response()->json([
             'success' => false,
-            'message' => 'Unable to Block'
+            'message' => $userToBlock->prefName . ' is Already Blocked',
         ]);
     }
-    
-    return response()->json([
-        'success' => false,
-        'message' => $userToBlock->prefName . ' is Already Blocked',
-    ]);
-}
 
 
     /**
@@ -411,31 +442,37 @@ class MatchesController extends Controller
     *
     * @return Response
     */
-    public function unblockMatch(Request $request){
+    public function unblockFriend(Request $request){
         $user = $request->user();
         $userToUnblock = User::where('id', $request['id'])->first();
         
+
+        // check user was found
         if(is_null($userToUnblock))
-        return response()->json([
-            'success' => false,
-            'message' => 'Could Not Find User'
-        ]);
+            // if they could not be found, return unsuccessful response
+            return response()->json([
+                'success' => false,
+                'message' => 'Could Not Find User'
+            ]);
         
+        // check user has blocked the userToUnblock
         if($user->hasBlocked($userToUnblock)){
-            
+            // attempt to unblock the userToUnblock
             if($user->unblockFriend($userToUnblock)){
+                // if unblock was successful, return a successful response
                 return response()->json([        
                     'success' => true,
                     'message' => 'Unblocked ' . $userToUnblock->prefName,
                 ]);
             }
-            
+            // return unsuccessful response if user couldn't be unblocked
             return response()->json([
                 'success' => false,
                 'message' => 'Unable to Unblock ' . $userToUnblock->prefName,
             ]);
         }
         
+        // return unsuccessful message if user was not blocked
         return response()->json([
             'success' => false,
             'message' => $userToUnblock->prefName . ' is Not Blocked',

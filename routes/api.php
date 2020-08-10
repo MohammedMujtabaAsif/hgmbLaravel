@@ -64,14 +64,15 @@ Route::group(['middleware' => ['auth:api']], function(){
 
                 Route::get('allOtherUsers', 'Api\UsersController@getAllOtherUsers');
 
-                Route::get('pendingMatches', 'Api\MatchesController@getPendingMatches');
-                Route::get('deniedMatches', 'Api\MatchesController@getDeniedMatches');
+                Route::get('incomingRequests', 'Api\MatchesController@getIncomingFriendRequests');
+                Route::get('outgoingRequests', 'Api\MatchesController@getOutgoingFriendRequests');
 
-                Route::get('acceptedMatches', 'Api\MatchesController@getAcceptedMatches');
+                Route::get('acceptedRequests', 'Api\MatchesController@getAcceptedFriendRequests');
 
-                Route::get('blockedMatches', 'Api\MatchesController@getBlockedMatches');
+                Route::get('deniedRequests', 'Api\MatchesController@getDeniedFriendRequests');
 
-                Route::get('sentRequests', 'Api\MatchesController@getSentRequests');
+                Route::get('blockedRequests', 'Api\MatchesController@getBlockedFriends');
+
             });
 
 
@@ -79,12 +80,12 @@ Route::group(['middleware' => ['auth:api']], function(){
             Route::group(['prefix' => 'post'], function () {
                 Route::post('userWithID', 'Api\UsersController@getUserWithID');
 
-                Route::post('sendMatchRequest', 'Api\MatchesController@sendMatchRequest');
-                Route::post('acceptMatchRequest', 'Api\MatchesController@acceptMatchRequest');
-                Route::post('denyMatchRequest', 'Api\MatchesController@denyMatchRequest');
-                Route::post('unmatch', 'Api\MatchesController@unmatch');
-                Route::post('blockMatch', 'Api\MatchesController@blockMatch');
-                Route::post('unblockMatch', 'Api\MatchesController@unblockMatch');
+                Route::post('sendFriendRequest', 'Api\MatchesController@sendFriendRequest');
+                Route::post('acceptFriendRequest', 'Api\MatchesController@acceptFriendRequest');
+                Route::post('denyFriendRequest', 'Api\MatchesController@denyFriendRequest');
+                Route::post('unfriend', 'Api\MatchesController@unfriend');
+                Route::post('blockFriend', 'Api\MatchesController@blockFriend');
+                Route::post('unblockFriend', 'Api\MatchesController@unblockFriend');
             });
             
             // Route::apiResources(['appointments' => 'Api\AppointmentsController']);        
