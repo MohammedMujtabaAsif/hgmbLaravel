@@ -45,8 +45,8 @@ Route::group(['middleware' => ['auth:api']], function(){
 
     //prefix POST routes with '/post'
     Route::group(['prefix' => 'post'], function () {
-        Route::post('post/deleteAccount', 'Api\UsersController@delete');
-        Route::post('post/updateAccount', 'Api\UsersController@update');
+        Route::post('deleteAccount', 'Api\UsersController@delete');
+        Route::post('updateAccount', 'Api\UsersController@update');
     });
 
     
