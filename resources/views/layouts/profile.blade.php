@@ -101,19 +101,25 @@
                                     <div class="d-flex w-100 justify-content-between">
                                         <h5 class="mb-1"><strong>Gender</strong></h5>
                                     </div>
-                                    <p class="mb-1">{{$userProf->gender->name}}</p>
+                                    @foreach($userProf->gender as $gender)
+                                    <p class="mb-1">{{$gender['name']}}</p>
+                                    @endforeach
                                 </a>
                                 <a class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h5 class="mb-1"><strong>City</strong></h5>
                                     </div>
-                                    <p class="mb-1">{{$userProf->city->name}}</p>
+                                    @foreach($userProf->city as $city)
+                                    <p class="mb-1">{{$city['name']}}</p>
+                                    @endforeach
                                 </a>
                                 <a class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h5 class="mb-1"><strong>Marital Status</strong></h5>
                                     </div>
-                                    <p class="mb-1">{{$userProf->maritalStatus->name}}</p>
+                                    @foreach($userProf->maritalStatus as $maritalStatus)
+                                    <p class="mb-1">{{$maritalStatus['name']}}</p>
+                                    @endforeach
                                 </a>
                                 <a class="list-group-item list-group-item-action flex-column align-items-start">
                                     <div class="d-flex w-100 justify-content-between">
