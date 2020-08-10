@@ -51,12 +51,41 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     protected $appends = [
-        'age'
+        'age',
+    ];
+
+    protected $with = [
+        'gender', 'city', 'maritalStatus', 'prefCities', 'prefGenders', 'prefMaritalStatuses'
     ];
 
     public function getAgeAttribute() {
         return (int) Carbon::parse($this->dob)->diff(Carbon::now())->format('%y');
     }
+
+    public function getGenderAttribute(){
+        return $this->gender()->get();
+    }
+
+    public function getCityAttribute(){
+        return $this->city()->get();
+    }
+
+    public function getMaritalStatusAttribute(){
+        return $this->maritalStatus()->get();
+    }
+
+    public function getprefCitiesAttribute(){
+        return $this->prefCities()->get();
+    }
+    
+    public function getprefGendersAttribute(){
+        return $this->prefGenders()->get();
+    }
+
+    public function getprefMaritalStatusesAttribute(){
+        return $this->prefMaritalStatuses()->get();
+    }
+    
 
     public function sendPasswordResetNotification($token)
     {
