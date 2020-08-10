@@ -104,8 +104,8 @@ class UsersController extends Controller
       'phoneNumber' => $request['phoneNumber'],
       'city_id' => (int) $request['city_id'],
       'gender_id' => (int) $request['gender_id'],
-      'marital_status_id' => (int) $request['marital_status_id'], 
-      'dob' => Carbon::createFromFormat('Y-m-d', $request['dob']),
+      'marital_status_id' => (int) $request['marital_status_id'],
+      'dob' => Carbon::createFromFormat('Y/m/d', $request['dob']),
       'numOfChildren' => $request['numOfChildren'],
       'bio' => $request['bio'],
       // TODO: imageAddress
