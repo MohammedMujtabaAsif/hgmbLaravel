@@ -55,11 +55,6 @@ class UsersController extends Controller
   public function update(Request $request){
     $user = $request->user();
 
-    $prefGender = 1;
-
-    if($request['gender_id']==1){
-        $prefGender = 2;
-    }
 
     $validator = Validator::make($request->all(), [
       //Validate user's personal details
@@ -185,13 +180,37 @@ class UsersController extends Controller
     */
   public function getAllOtherUsers()
   {
-
+    // TODO: check users are friends
     // $users = auth()->user()->getAllFriendships();
-    //TODO: Make SELECT query using User's preferences
 
-    $users = User::where('id', '!=', auth()->user()->id)
+    $user = auth()->user();
+
+    $prefGenders = $user->prefGenders;
+    $prefCities = $user->prefCities;
+    $prefMaritalStatues = $user->prefMaritalStatuses;
+
+    $genders = array();
+    $cities = array();
+    $maritalStatuses = array();
+
+    foreach ($prefGenders as $prefGender){
+      $genders[] = $prefGender->gender_id;
+    }
+
+    foreach ($prefCities as $prefCity){
+      $cities[] = $prefCity->city_id;
+    }
+
+    foreach ($prefMaritalStatues as $prefMaritalStatus){
+      $maritalStatuses[] = $prefMaritalStatus->marital_status_id;
+    }
+
+    $users = User::where('id', '!=', $user->id)
                   ->where('adminApproved', 1)
                   ->where('adminBanned', 0)
+                  ->whereIn('gender_id', $genders)
+                  ->whereIn('city_id', $cities)
+                  ->whereIn('marital_status_id', $maritalStatuses)
                   ->paginate(20);
 
     if(count($users) === 0)
