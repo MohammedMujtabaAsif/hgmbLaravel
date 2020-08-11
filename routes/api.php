@@ -62,7 +62,6 @@ Route::group(['middleware' => ['auth:api']], function(){
             Route::group(['prefix' => 'get'], function () {
                 Route::get('verify', 'Api\UsersController@verificationCheck');
 
-                Route::get('allOtherUsers', 'Api\UsersController@getAllOtherUsers');
 
                 Route::get('incomingRequests', 'Api\MatchesController@getIncomingFriendRequests');
                 Route::get('outgoingRequests', 'Api\MatchesController@getOutgoingFriendRequests');
@@ -78,6 +77,7 @@ Route::group(['middleware' => ['auth:api']], function(){
 
             //prefix POST routes with '/post'
             Route::group(['prefix' => 'post'], function () {
+                Route::post('allOtherUsers', 'Api\UsersController@getAllOtherUsers');
                 Route::post('userWithID', 'Api\UsersController@getUserWithID');
 
                 Route::post('sendFriendRequest', 'Api\MatchesController@sendFriendRequest');
