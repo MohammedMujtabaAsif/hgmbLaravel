@@ -17,7 +17,6 @@ class CreateCityUserTable extends Migration
             $table->id();
             $table->bigInteger('city_id');
             $table->bigInteger('user_id');
-            // $table->timestamps();
         });
     }
 

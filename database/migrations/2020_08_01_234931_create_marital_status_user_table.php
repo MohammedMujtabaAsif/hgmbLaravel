@@ -17,7 +17,7 @@ class CreateMaritalstatusUserTable extends Migration
             $table->id();
             $table->bigInteger('marital_status_id');
             $table->bigInteger('user_id');
-            $table->timestamps();
+   
         });
     }
 

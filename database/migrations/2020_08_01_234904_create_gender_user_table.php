@@ -17,7 +17,6 @@ class CreateGenderUserTable extends Migration
             $table->id();
             $table->bigInteger('gender_id');
             $table->bigInteger('user_id');
-            $table->timestamps();
         });
     }
 
