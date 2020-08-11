@@ -178,7 +178,7 @@ class UsersController extends Controller
     *
     * @return Response success User
     */
-  public function getAllOtherUsers()
+  public function getAllOtherUsers(Request $request)
   {
     // TODO: check users are friends
     // $users = auth()->user()->getAllFriendships();
@@ -205,19 +205,26 @@ class UsersController extends Controller
       $maritalStatuses[] = $prefMaritalStatus->marital_status_id;
     }
 
-    $users = User::where('id', '!=', $user->id)
-                  ->where('adminApproved', 1)
-                  ->where('adminBanned', 0)
+    $users = collect(User::where('id', '!=', $user->id)
+                  // ->where('adminApproved', 1)
+                  // ->where('adminBanned', 0)
+                  ->where('numOfChildren', "=<", $user->prefMaxNumOfChildren)
                   ->whereIn('gender_id', $genders)
                   ->whereIn('city_id', $cities)
                   ->whereIn('marital_status_id', $maritalStatuses)
-                  ->paginate(20);
+                  ->get()
+                  ->whereBetween('age', [$user->prefMinAge, $user->prefMaxAge])
+                  ->makeVisible(['adminApproved',])
+                  ->values()
+                  ->all()
+                  )                  
+                  ->forPage($request->pageNum, 20);
 
     if(count($users) === 0)
       return response()->json([
         'success' => false,
         'message' => 'No Other Users Have Been Approved Yet'
-      ]);
+      ]);    
 
     return response()->json([
       'success' => true,
@@ -246,5 +253,10 @@ class UsersController extends Controller
         'success' => true,
         'data' => $user
       ]);
+  }
+
+  // TODO: Allow user to update prefrences without needing reapproval
+  public function updatePreferences(Request $request){
+
   }
 }
