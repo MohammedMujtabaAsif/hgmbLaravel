@@ -206,7 +206,7 @@ class UsersController extends Controller
     }
 
     $users = collect(User::where('id', '!=', $user->id)
-                  // ->where('adminApproved', 1)
+                  ->where('adminApproved', 1)
                   ->where('adminBanned', 0)
                   ->where('numOfChildren', '<=', $user->prefMaxNumOfChildren)
                   ->whereIn('gender_id', $genders)
