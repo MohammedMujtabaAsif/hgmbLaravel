@@ -183,7 +183,7 @@ class UsersController extends Controller
     // TODO: check users are friends
     // $users = auth()->user()->getAllFriendships();
 
-    $user = auth()->user();
+    $user = $request->user();
 
     $prefGenders = $user->prefGenders;
     $prefCities = $user->prefCities;
