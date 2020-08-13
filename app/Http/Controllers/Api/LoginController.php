@@ -37,7 +37,13 @@ class LoginController extends Controller
         //Attempt to login user with request details
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             //if successful, get User and Create token
-            $user = Auth::user();
+            $user = Auth::user()->makeVisible([
+                  'firstNames',
+                  'surname',
+                  'email',
+                  'phoneNumber',
+                  'dob',
+                ]);
             $token['token'] = $user->createToken('appToken')->accessToken;
 
             // return the User and Token with positive success as JSON
