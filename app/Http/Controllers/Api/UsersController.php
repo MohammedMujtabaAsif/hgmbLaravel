@@ -32,6 +32,7 @@ class UsersController extends Controller
                   'dob',
                 ]);
 
+
     if(is_null($user))
       return response()->json([
         'success' => false,
@@ -61,7 +62,7 @@ class UsersController extends Controller
       'firstNames' => 'required|string',
       'surname' => 'required|string',
       'prefName'=>'required|string',
-      'email' => 'required|unique:users,email,' . $request->user()->id,
+      'email' => 'required|email|unique:users,email,' . $request->user()->id,
       'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users,phoneNumber,' . $request->user()->id,
       'city_id' => 'required|integer|min:1|max:3',
       'gender_id'=>'required|integer|min:1|max:2',
