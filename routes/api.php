@@ -26,7 +26,7 @@ Route::post('post/password/sendResetEmail', 'Auth\ForgotPasswordController@sendR
 
 
 // Email Verification route
-Route::get('post/email/verify/{id}/{hash}', 'Api\VerificationController@verify')->name('verification.verify');
+Route::get('get/email/verify/{id}/{hash}', 'Api\VerificationController@verify')->name('verification.verify');
 
 
 Route::group(['middleware' => ['auth:api']], function(){
@@ -34,7 +34,7 @@ Route::group(['middleware' => ['auth:api']], function(){
     // Allow users who:
     // HAVE authenticated themselves
 
-    //prefix GET routes with '/get'
+    //prefix GET routes with '/get/'
     Route::group(['prefix' => 'get'], function () {
         Route::get('logout', 'Api\LoginController@logout');
         Route::get('user', 'Api\UsersController@index');
@@ -43,14 +43,13 @@ Route::group(['middleware' => ['auth:api']], function(){
     });
 
 
-    //prefix POST routes with '/post'
+    //prefix POST routes with '/post/'
     Route::group(['prefix' => 'post'], function () {
         Route::post('deleteAccount', 'Api\UsersController@delete');
         Route::post('updateAccount', 'Api\UsersController@update');
     });
 
     
-
         Route::group(['middleware' => ['CustomEmailVerified', 'approved']], function () {
             // Allow users who:
             // HAVE verified their email address,
@@ -58,7 +57,7 @@ Route::group(['middleware' => ['auth:api']], function(){
             // NOT banned to reach these routes
 
 
-            //prefix GET routes with '/get'
+            //prefix GET routes with '/get/'
             Route::group(['prefix' => 'get'], function () {
                 Route::get('verify', 'Api\UsersController@verificationCheck');
 
@@ -75,7 +74,7 @@ Route::group(['middleware' => ['auth:api']], function(){
             });
 
 
-            //prefix POST routes with '/post'
+            //prefix POST routes with '/post/'
             Route::group(['prefix' => 'post'], function () {
                 Route::post('allOtherUsers', 'Api\UsersController@getAllOtherUsers');
                 Route::post('userWithID', 'Api\UsersController@getUserWithID');
