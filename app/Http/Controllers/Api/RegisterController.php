@@ -101,12 +101,14 @@ class RegisterController extends Controller
 
             $user->sendEmailVerificationNotification();
 
-            $user = $user->makeVisible([
-                            'firstNames',
-                            'surname',
-                            'email',
-                            'phoneNumber',
-                            'dob',
+            $user = User::where('id', $user->id)
+                        ->first()
+                        ->makeVisible([
+                        'firstNames',
+                        'surname',
+                        'email',
+                        'phoneNumber',
+                        'dob',
                         ]);
 
             $token['token'] = $user->createToken('appToken')->accessToken;
