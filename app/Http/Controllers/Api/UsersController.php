@@ -55,13 +55,13 @@ class UsersController extends Controller
     */
   public function update(Request $request){
     $user = $request->user();
-
-
+    $regex = "/^([^0-9?;@#~{}><:!£$%^&*()¬`|=_+]*]*)$/";
+    
     $validator = Validator::make($request->all(), [
       //Validate user's personal details
-      'firstNames' => "required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
-      'surname' => "required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
-      'prefName'=>"required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
+      'firstNames' => ['required', 'string', 'regex:'.$regex],
+      'surname' => ['required', 'string', 'regex:'.$regex],
+      'prefName'=>['required', 'string', 'regex:'.$regex],
       'email' => 'required|email|unique:users,email,' . $request->user()->id,
       'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users,phoneNumber,' . $request->user()->id,
       'city_id' => 'required|integer|min:1|max:3',
@@ -80,7 +80,7 @@ class UsersController extends Controller
       'pref_marital_statuses'=>'required|array|distinct',
       'pref_marital_statuses.*'=>'integer|min:1|max:3',
       'pref_min_age'=>'required|integer|min:18',
-      'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
+      // 'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
       'pref_num_of_children'=>'required|integer',
     ]);
 

@@ -24,11 +24,12 @@ class RegisterController extends Controller
      */
     protected function validator(Array $request)
     {
+        $regex = "/^([^0-9?;@#~{}><:!£$%^&*()¬`|=_+]*]*)$/";
         return Validator::make($request, [
       //Validate user's personal details
-      'firstNames' => "required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
-      'surname' => "required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
-      'prefName'=>"required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
+      'firstNames' => ['required', 'string', 'regex:'.$regex],
+      'surname' => ['required', 'string', 'regex:'.$regex],
+      'prefName'=>['required', 'string', 'regex:'.$regex],
       'email' => 'required|email|unique:users',
       'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users',
       'city_id' => 'required|integer|min:1|max:3',
