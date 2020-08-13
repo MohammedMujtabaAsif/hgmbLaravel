@@ -59,15 +59,15 @@ class UsersController extends Controller
 
     $validator = Validator::make($request->all(), [
       //Validate user's personal details
-      'firstNames' => 'required|string',
-      'surname' => 'required|string',
-      'prefName'=>'required|string',
+      'firstNames' => "required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
+      'surname' => "required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
+      'prefName'=>"required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
       'email' => 'required|email|unique:users,email,' . $request->user()->id,
       'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users,phoneNumber,' . $request->user()->id,
       'city_id' => 'required|integer|min:1|max:3',
       'gender_id'=>'required|integer|min:1|max:2',
       'marital_status_id'=>'required|integer|min:1|max:3',
-      'dob'=>'required|date|before:18 years ago|after:65 years ago',
+      'dob'=>'required|date|before:18 years ago|after:70 years ago',
       'numOfChildren'=>'integer',
       'bio'=>'required|string|max:1000',
       'image' => 'file|max:5000',
@@ -93,17 +93,17 @@ class UsersController extends Controller
 
     $user->update([
       // //User's personal details
-      'firstNames' => $request['firstNames'],
-      'surname' => $request['surname'],
-      'prefName'=> $request['prefName'],
-      'email' => $request['email'],
-      'phoneNumber' => $request['phoneNumber'],
+      'firstNames' => $request['firstNames'].trim(),
+      'surname' => $request['surname'].trim(),
+      'prefName'=> $request['prefName'].trim(),
+      'email' => $request['email'].trim(),
+      'phoneNumber' => $request['phoneNumber'].trim(),
       'city_id' => (int) $request['city_id'],
       'gender_id' => (int) $request['gender_id'],
       'marital_status_id' => (int) $request['marital_status_id'],
       'dob' => Carbon::createFromFormat('Y/m/d', $request['dob']),
       'numOfChildren' => $request['numOfChildren'],
-      'bio' => $request['bio'],
+      'bio' => $request['bio'].trim(),
       // TODO: imageAddress
 
 

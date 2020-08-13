@@ -25,31 +25,30 @@ class RegisterController extends Controller
     protected function validator(Array $request)
     {
         return Validator::make($request, [
-            //Validate user's personal details
-            'firstNames' => 'required|string',
-            'surname' => 'required|string',
-            'prefName'=>'required|string',
-            'email' => 'required|unique:users|email',
-            'password' => 'required|string|confirmed',
-            'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users',
-            'dob'=>'required|date|before:18 years ago|after:70 years ago',
-            'numOfChildren'=>'integer',
-            'bio'=>'required|string|max:1000',
-            'city_id' => 'required|integer|min:1|max:3',
-            'gender_id'=>'required|integer|min:1|max:2',
-            'marital_status_id'=>'required|integer|min:1|max:3',
-            'prefMinAge'=>'required|integer|min:18|lt:prefMaxAge',
-            'prefMaxAge'=>'required|integer|min:20|gt:prefMinAge',
-            'prefMaxNumOfChildren'=>'required|integer',
-            'image' => 'file|max:5000',
+      //Validate user's personal details
+      'firstNames' => "required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
+      'surname' => "required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
+      'prefName'=>"required|string|regex:^([^0-9?;@#~{}/><:!£$%^&*()¬`|=_+]*)$/",
+      'email' => 'required|email|unique:users',
+      'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users',
+      'city_id' => 'required|integer|min:1|max:3',
+      'gender_id'=>'required|integer|min:1|max:2',
+      'marital_status_id'=>'required|integer|min:1|max:3',
+      'dob'=>'required|date|before:18 years ago|after:70 years ago',
+      'numOfChildren'=>'integer',
+      'bio'=>'required|string|max:1000',
+      'image' => 'file|max:5000',
 
-            //Validate user's partner preferences
-            'pref_cities' => 'required|array|distinct',
-            'pref_cities.*' => 'integer|min:1|max:3',
-            'pref_genders'=>'required|array|distinct',
-            'pref_genders.*'=>'integer|min:1|max:2',
-            'pref_marital_statuses'=>'required|array|distinct',
-            'pref_marital_statuses.*'=>'integer|min:1|max:3',
+      //Validate user's partner preferences
+      'pref_cities' => 'required|array|distinct',
+      'pref_cities.*' => 'integer|min:1|max:3',
+      'pref_genders'=>'required|array|distinct',
+      'pref_genders.*'=>'integer|min:1|max:2',
+      'pref_marital_statuses'=>'required|array|distinct',
+      'pref_marital_statuses.*'=>'integer|min:1|max:3',
+      'pref_min_age'=>'required|integer|min:18',
+      'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
+      'pref_num_of_children'=>'required|integer',
         ]);
     }
 
@@ -75,15 +74,15 @@ class RegisterController extends Controller
 
             $user =  User::create([
                 // //User's personal details
-                'firstNames' => $request['firstNames'],
-                'surname' => $request['surname'],
-                'prefName'=> $request['prefName'],
-                'email' => $request['email'],
+                'firstNames' => $request['firstNames'].trim(),
+                'surname' => $request['surname'].trim(),
+                'prefName'=> $request['prefName'].trim(),
+                'email' => $request['email'].trim(),
                 'password' => bcrypt($request['password']),
-                'phoneNumber' => $request['phoneNumber'],
+                'phoneNumber' => $request['phoneNumber'].trim(),
                 'dob' => Carbon::createFromFormat('Y/m/d', $request['dob']),
-                'numOfChildren' => (int) $request['numOfChildren'],
-                'bio' => $request['bio'],
+                'numOfChildren' => (int) $request['numOfChildren'].trim(),
+                'bio' => $request['bio'].trim(),
                 'city_id' => (int) $request['city_id'],
                 'gender_id' => (int) $request['gender_id'],
                 'marital_status_id' => (int) $request['marital_status_id'],
