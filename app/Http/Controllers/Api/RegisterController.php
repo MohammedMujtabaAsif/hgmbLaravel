@@ -99,8 +99,9 @@ class RegisterController extends Controller
             $user->prefGenders()->sync((int) $request['pref_genders']);
             $user->prefMaritalStatuses()->sync((int) $request['pref_marital_statuses']);
 
-            $user = $user->first()
-                        ->makeVisible([
+            $user->sendEmailVerificationNotification();
+
+            $user = $user->makeVisible([
                             'firstNames',
                             'surname',
                             'email',
@@ -112,6 +113,7 @@ class RegisterController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => "Verification Email Sent to " . $user->email,
                 'token' => $token,
                 'user' => $user,
             ], 201);
