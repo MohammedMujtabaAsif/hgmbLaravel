@@ -21,7 +21,7 @@ class MatchesController extends Controller
     * @return Response
     */
     public function getIncomingFriendRequests(){
-        $friendRequests = request()->user()->getFriendRequests();
+        $friendRequests = request()->user()->getFriendRequests(15);
         
         $senders = array();
         
@@ -55,7 +55,7 @@ class MatchesController extends Controller
     * @return Response
     */
     public function getOutgoingFriendRequests(){
-        $friendRequests = request()->user()->getPendingFriendships(10);
+        $friendRequests = request()->user()->getPendingFriendships(15);
         $id = request()->user()->id;
 
         $recipients = array();
@@ -91,7 +91,7 @@ class MatchesController extends Controller
     * @return Response
     */
     public function getAcceptedFriendRequests(){
-        $friends = request()->user()->getFriends(10);
+        $friends = request()->user()->getFriends(15);
 
         // check there are no friends found
         if(count($friends) == 0)
@@ -115,7 +115,7 @@ class MatchesController extends Controller
     *  @return Response deniedUsers
     */
     public function getDeniedFriendRequests(){
-        $deniedRequests = request()->user()->getDeniedFriendships(10);
+        $deniedRequests = request()->user()->getDeniedFriendships(15);
         $id = request()->user()->id;
 
         $deniedUsers = array();
@@ -150,7 +150,7 @@ class MatchesController extends Controller
     *  @return Response blockedUsers
     */
     public function getBlockedFriends(){
-        $blockedFriends = request()->user()->getBlockedFriendships(10);
+        $blockedFriends = request()->user()->getBlockedFriendships(15);
         $id = request()->user()->id;
 
         $blockedUsers = array();

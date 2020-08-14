@@ -217,7 +217,7 @@ class UsersController extends Controller
                   ->get()
                   ->whereBetween('age', [$user->prefMinAge, $user->prefMaxAge])
                   )
-                  ->forPage($request->pageNum, 20)
+                  ->forPage($request->pageNum, 15)
                   ->values()
                   ->all()
                   ;
