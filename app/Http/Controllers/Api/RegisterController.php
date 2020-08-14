@@ -75,15 +75,15 @@ class RegisterController extends Controller
 
             $user =  User::create([
                 // //User's personal details
-                'firstNames' => $request['firstNames'].trim(),
-                'surname' => $request['surname'].trim(),
-                'prefName'=> $request['prefName'].trim(),
-                'email' => $request['email'].trim(),
+                'firstNames' => trim($request['firstNames']),
+                'surname' => trim($request['surname']),
+                'prefName'=> trim($request['prefName']),
+                'email' => trim($request['email']),
                 'password' => bcrypt($request['password']),
-                'phoneNumber' => $request['phoneNumber'].trim(),
+                'phoneNumber' => trim($request['phoneNumber']),
                 'dob' => Carbon::createFromFormat('Y/m/d', $request['dob']),
-                'numOfChildren' => (int) $request['numOfChildren'].trim(),
-                'bio' => $request['bio'].trim(),
+                'numOfChildren' => (int) $request['numOfChildren'],
+                'bio' => trim($request['bio']),
                 'city_id' => (int) $request['city_id'],
                 'gender_id' => (int) $request['gender_id'],
                 'marital_status_id' => (int) $request['marital_status_id'],
@@ -95,6 +95,7 @@ class RegisterController extends Controller
                 'prefMaxNumOfChildren' => (int) $request['prefMaxNumOfChildren'],
             ]);
 
+            //User's partner preferences
             $user->prefCities()->sync((int) $request['pref_cities']);
             $user->prefGenders()->sync((int) $request['pref_genders']);
             $user->prefMaritalStatuses()->sync((int) $request['pref_marital_statuses']);

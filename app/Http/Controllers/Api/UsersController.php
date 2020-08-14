@@ -56,7 +56,7 @@ class UsersController extends Controller
   public function update(Request $request){
     $user = $request->user();
     $regex = "/^([^0-9?;@#~{}><:!£$%^&*()¬`|=_+]*]*)$/";
-    
+
     $validator = Validator::make($request->all(), [
       //Validate user's personal details
       'firstNames' => ['required', 'string', 'regex:'.$regex],
@@ -93,17 +93,17 @@ class UsersController extends Controller
 
     $user->update([
       // //User's personal details
-      'firstNames' => $request['firstNames'].trim(),
-      'surname' => $request['surname'].trim(),
-      'prefName'=> $request['prefName'].trim(),
-      'email' => $request['email'].trim(),
-      'phoneNumber' => $request['phoneNumber'].trim(),
+      'firstNames' => trim($request['firstNames']),
+      'surname' => trim($request['surname']),
+      'prefName'=> trim($request['prefName']),
+      'email' => trim($request['email']),
+      'phoneNumber' => trim($request['phoneNumber']),
+      'dob' => Carbon::createFromFormat('Y/m/d', $request['dob']),
+      'numOfChildren' => $request['numOfChildren'],
+      'bio' => trim($request['bio']),
       'city_id' => (int) $request['city_id'],
       'gender_id' => (int) $request['gender_id'],
       'marital_status_id' => (int) $request['marital_status_id'],
-      'dob' => Carbon::createFromFormat('Y/m/d', $request['dob']),
-      'numOfChildren' => $request['numOfChildren'],
-      'bio' => $request['bio'].trim(),
       // TODO: imageAddress
 
 
@@ -114,6 +114,7 @@ class UsersController extends Controller
       
     ]);
 
+    //User's partner preferences
     $user->prefCities()->sync($request['pref_cities']);
     $user->prefGenders()->sync($request['pref_genders']);
     $user->prefMaritalStatuses()->sync($request['pref_marital_statuses']);
