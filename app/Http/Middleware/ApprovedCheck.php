@@ -18,7 +18,7 @@ class ApprovedCheck
         // Check user is banned
         if($request->user()->adminBanned == 1){
             //Return a message explaining ban
-            $code = 403;
+            $code = 401;
             $type = "banned";
             $message = "Banned by Admins";
             if(!empty($request->user()->adminBannedMessage))
@@ -32,7 +32,7 @@ class ApprovedCheck
         // if not banned or approved, User must be unapproved
         else{
             // Return message explaining uapproval
-            $code = 401;
+            $code = 402;
             $type = "unapproved";
             $message = "Awaiting Admin Approval";
             if(!empty($request->user()->adminUnapprovedMessage))
