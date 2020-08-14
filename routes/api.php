@@ -15,10 +15,10 @@ use Route;
 */
 
 // Allow any user to reach these routes
-
-Route::post('post/register', 'Api\RegisterController@register')->name('user.register');
-Route::post('post/login', 'Api\LoginController@login')->name('user.login');
-
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('post/register', 'Api\RegisterController@register')->name('user.register');
+    Route::post('post/login', 'Api\LoginController@login')->name('user.login');
+});
 
 // Password reset routes
 Route::post('post/password/sendResetEmail', 'Auth\ForgotPasswordController@sendResetLinkEmail');
