@@ -44,15 +44,17 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::post('/approve', 'AdminsController@approveUser')->name('admin.approveUser'); 
     Route::post('/unapprove', 'AdminsController@unapproveUser')->name('admin.unapproveUser'); 
-    // Route::post('/unapprove/message', 'AdminsController@addUnapprovalMessage')->name('admin.messageUser');
     Route::post('/ban', 'AdminsController@banUser')->name('admin.banUser'); 
     Route::post('/unban', 'AdminsController@unbanUser')->name('admin.unbanUser');   
     Route::post('/delete', 'AdminsController@deleteUser')->name('admin.deleteUser');
   });
  
 
+  //TODO: setup appointment scheduling
   Route::get('/schedule', 'AdminsController@getSchedule')->name('admin.schedule'); 
 
+
+  //TODO: setup superadmin controls
   Route::group(['middleware' => ['superadmin']], function () {      
     Route::get('/admins', 'AdminsController@getAdmins')->name('admin.admins');
     Route::post('/admins/delete', 'AdminsController@deleteAdmin')->name('admin.deleteAdmin');
