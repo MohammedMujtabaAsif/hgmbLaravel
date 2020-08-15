@@ -3,6 +3,7 @@
 
 @section('buttons')
 
+    @if(!is_null($userProf))
     <!-- <div style="display:inline-block">
         <form method="POST" action="{{ route('user.deactivateAccount', ['id' => $userProf->id]) }}">
             @csrf
@@ -20,5 +21,5 @@
             </div>
         </form>
     </div>
-
+    @endif
 @endsection
