@@ -31,6 +31,7 @@ class RegisterController extends Controller
       'surname' => ['required', 'string', 'regex:'.$regex],
       'prefName'=>['required', 'string', 'regex:'.$regex],
       'email' => 'required|email|unique:users',
+      'password' => 'required|confirmed|min:8',
       'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users',
       'city_id' => 'required|integer|min:1|max:3',
       'gender_id'=>'required|integer|min:1|max:2',
@@ -90,9 +91,9 @@ class RegisterController extends Controller
                 // TODO: imageAddress
 
                 //User's partner preferences
-                'prefMinAge' => (int) $request['prefMinAge'],
-                'prefMaxAge' => (int) $request['prefMaxAge'],
-                'prefMaxNumOfChildren' => (int) $request['prefMaxNumOfChildren'],
+                'prefMinAge' => (int) $request['pref_min_age'],
+                'prefMaxAge' => (int) $request['pref_max_age'],
+                'prefMaxNumOfChildren' => (int) $request['pref_num_of_children'],
             ]);
 
             //User's partner preferences
