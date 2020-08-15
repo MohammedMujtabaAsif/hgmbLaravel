@@ -31,12 +31,8 @@ class RegisterController extends Controller
       'surname' => ['required', 'string', 'regex:'.$regex],
       'prefName'=>['required', 'string', 'regex:'.$regex],
       'email' => 'required|email|unique:users',
-<<<<<<< HEAD
       'password' => 'required|confirmed|min:8',
       'phoneNumber' => 'required|string|max:11|regex:/(0)[0-9]{10}/|unique:users',
-=======
-      'phoneNumber' => 'required|string|confirmed|max:11|regex:/(0)[0-9]{10}/|unique:users',
->>>>>>> 2518ab794cb21c0c23f6a26678255d6f921e343e
       'city_id' => 'required|integer|min:1|max:3',
       'gender_id'=>'required|integer|min:1|max:2',
       'marital_status_id'=>'required|integer|min:1|max:3',
