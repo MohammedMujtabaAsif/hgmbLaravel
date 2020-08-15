@@ -55,6 +55,8 @@ class UsersController extends Controller
     */
   public function update(Request $request){
     $user = $request->user();
+    $userEmail = $request->user()->email;
+
     $regex = "/^([^0-9?;@#~{}><:!£$%^&*()¬`|=_+]*]*)$/";
 
     $validator = Validator::make($request->all(), [
@@ -120,6 +122,11 @@ class UsersController extends Controller
     $user->prefMaritalStatuses()->sync($request['pref_marital_statuses']);
 
     $user->adminApproved = 0;
+
+    if(strcmp($userEmail, $user->email) != 0){
+      $request->user()->email_verified_at = null;
+      $user->sendEmailVerificationNotification();
+    }
 
     $user->save();
 
