@@ -37,7 +37,7 @@ class RegisterController extends Controller
             'gender_id'=>'required|integer|min:1|max:2',
             'marital_status_id'=>'required|integer|min:1|max:3',
             'dob'=>'required|date|before:18 years ago|after:70 years ago',
-            'numOfChildren'=>'integer|lt:10|gt:0',
+            'numOfChildren'=>'integer|max:10|min:0',
             'bio'=>'required|string|max:1000',
             'image' => 'file|max:5000',
 
@@ -50,7 +50,7 @@ class RegisterController extends Controller
             'pref_marital_statuses.*'=>'integer|min:1|max:3',
             'pref_min_age'=>'required|integer|min:18',
             'pref_max_age'=>'required|integer|min:20|max:70|gt:pref_min_age',
-            'pref_num_of_children'=>'required|integer|lt:10|gt:0',
+            'pref_num_of_children'=>'required|integer|max:10|min:0',
         ]);
     }
 
