@@ -44,7 +44,7 @@ class AdminsController extends Controller
      */
     public function getApprovedUsers()
     {
-        $approvedUsers = User::where('adminApproved', 1)->where('adminBanned',  0)->orderBy('firstNames')->paginate(15, ['*'],'adminApproved');
+        $approvedUsers = User::where('adminApproved', 1)->where('adminBanned',  0)->orderBy('firstNames')->paginate(15);
         return view ('admins/users', ['users' => $approvedUsers, 'title' => 'Approved Users']);
     }
 
@@ -59,7 +59,7 @@ class AdminsController extends Controller
      */
     public function getUnapprovedUsers()
     {
-        $unapprovedUsers = User::where('adminApproved', 0)->where('adminBanned', 0)->where('email_verified_at', '!=', NULL)->orderBy('updated_at', 'asc')->paginate(15, ['*'],'adminUnapproved');
+        $unapprovedUsers = User::where('adminApproved', 0)->where('adminBanned', 0)->where('email_verified_at', '!=', NULL)->orderBy('updated_at', 'asc')->paginate(15);
         return view ('admins/users', ['users' => $unapprovedUsers, 'title' => 'Unapproved Users']);
     }
 
@@ -73,7 +73,7 @@ class AdminsController extends Controller
      */
     public function getBannedUsers()
     {
-        $bannedUsers = User::where('adminBanned', 1)->orderBy('updated_at')->paginate(15, ['*'], 'adminBanned');
+        $bannedUsers = User::where('adminBanned', 1)->orderBy('updated_at')->paginate(15);
         return view ('admins/users', ['users' => $bannedUsers, 'title' => 'Banned Users']);
     }
 
@@ -92,9 +92,6 @@ class AdminsController extends Controller
     public function getUser($id)
     {
         $user = User::where('id', $id)->first();
-        //  dd($user);
-        session()->flash('status.level', 'success');
-        session()->flash('success', 'user found');
         return view ('admins/user')->with(['userProf' => $user]);
     }
 
