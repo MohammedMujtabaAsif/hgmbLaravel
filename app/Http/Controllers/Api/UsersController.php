@@ -70,7 +70,7 @@ class UsersController extends Controller
       'gender_id'=>'required|integer|min:1|max:2',
       'marital_status_id'=>'required|integer|min:1|max:3',
       'dob'=>'required|date|before:18 years ago|after:70 years ago',
-      'numOfChildren'=>'integer',
+      'numOfChildren'=>'integer|lt:10|gt:0',
       'bio'=>'required|string|max:1000',
       'image' => 'file|max:5000',
 
@@ -81,9 +81,9 @@ class UsersController extends Controller
       'pref_genders.*'=>'integer|min:1|max:2',
       'pref_marital_statuses'=>'required|array|distinct',
       'pref_marital_statuses.*'=>'integer|min:1|max:3',
-      'pref_min_age'=>'required|integer|min:18',
-      // 'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
-      'pref_num_of_children'=>'required|integer',
+      'pref_min_age'=>'required|integer|min:18|max:68',
+      'pref_max_age'=>'required|integer|min:20|gt:pref_min_age',
+      'pref_num_of_children'=>'required|integer|lt:10|gt:0',
     ]);
 
     if($validator->fails()){
@@ -103,17 +103,15 @@ class UsersController extends Controller
       'dob' => Carbon::createFromFormat('Y/m/d', $request['dob']),
       'numOfChildren' => $request['numOfChildren'],
       'bio' => trim($request['bio']),
-      'city_id' => (int) $request['city_id'],
-      'gender_id' => (int) $request['gender_id'],
-      'marital_status_id' => (int) $request['marital_status_id'],
+      'city_id' =>  $request['city_id'],
+      'gender_id' =>  $request['gender_id'],
+      'marital_status_id' => $request['marital_status_id'],
       // TODO: imageAddress
-
 
       //User's partner preferences
       'prefMinAge' => $request['pref_min_age'],
       'prefMaxAge' => $request['pref_max_age'],
-      'prefMaxNumOfChildren' => $request['pref_num_of_children'],
-      
+      'prefMaxNumOfChildren' => $request['pref_num_of_children'],      
     ]);
 
     //User's partner preferences
