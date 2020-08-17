@@ -18,14 +18,16 @@ class BannedCheck
     {   
         $user = $request->user();
 
-        try {
-            $user = User::where('email', $request->email)->first()->makeVisible('adminBanned');
-        } finally {
-            if($user==null){
-                return response()->json([
-                    'success' => false,
-                    'message' => "Email Address Not Found",
-                ], 400); 
+        if($user==null){
+            try {
+                $user = User::where('email', $request->email)->first()->makeVisible('adminBanned');
+            } finally {
+                if($user==null){
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Email Address Not Found",
+                    ], 400); 
+                }
             }
         }
 
