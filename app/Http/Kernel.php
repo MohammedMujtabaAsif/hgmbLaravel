@@ -64,7 +64,8 @@ class Kernel extends HttpKernel
 
         // Custom middleware to check user is admin approved
         'approved' => \App\Http\Middleware\ApprovedCheck::class,
-        'CustomEmailVerified' => \App\Http\Middleware\CustomEmailVerified::class,
+        'banned' => \App\Http\Middleware\BannedCheck::class,
+        'emailVerified' => \App\Http\Middleware\CustomEmailVerified::class,
     ];
 
     /**

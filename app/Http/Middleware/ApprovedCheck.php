@@ -15,35 +15,27 @@ class ApprovedCheck
      */
     public function handle($request, Closure $next)
     {
-        // Check user is banned
-        if($request->user()->adminBanned == 1){
-            //Return a message explaining ban
-            $code = 401;
-            $type = "banned";
-            $message = "Banned by Admins";
-            if(!empty($request->user()->adminBannedMessage))
-                $message = $request->user()->adminBannedMessage;
-        }
-        // Check user is approved by admin's
-        elseif($request->user()->adminApproved == 1){
-            // Return the Route the User attempted to access
-            return $next($request);
-        }
-        // if not banned or approved, User must be unapproved
-        else{
-            // Return message explaining uapproval
-            $code = 402;
-            $type = "unapproved";
+        // check user is unapproved by admins
+        if($request->user()->adminApproved == 0){
+            // Setup message explaining unapproval
+
+            // Setup a default message
             $message = "Awaiting Admin Approval";
+
+            // Replace with admin message if it exists
             if(!empty($request->user()->adminUnapprovedMessage))
                 $message = $request->user()->adminUnapprovedMessage;
+
+            // Return JSON message explaining lack of access
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+                'type' => "unapproved",
+            ], 402);
         }
 
-        // Return JSON message explaining lack of access
-        return response()->json([
-            'success' => false,
-            'message' => $message,
-            'type' => $type,
-        ], $code);
+        // Allow access if the user is approved
+        return $next($request);
+
     }
 }
