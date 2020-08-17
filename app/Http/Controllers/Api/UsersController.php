@@ -90,7 +90,7 @@ class UsersController extends Controller
       return response()->json([
         'success' => false,
         'message' => $validator->errors(),
-      ]);
+      ], 400);
     }
 
     $user->update([
