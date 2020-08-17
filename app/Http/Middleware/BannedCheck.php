@@ -23,14 +23,11 @@ class BannedCheck
         } finally {
             if($user==null){
                 return response()->json([
-                'success' => false,
-                'message' => "Email Address Not Found",
-                'type' => $type,
-                ], 401); 
+                    'success' => false,
+                    'message' => "Email Address Not Found",
+                ], 400); 
             }
         }
-
-
 
         // Check user is banned
         if($user->adminBanned == 1){
